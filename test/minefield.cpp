@@ -310,3 +310,27 @@ TEST_CASE("Open Recursively") {
     mfield.open(0, 0);
     CHECK(! mfield.isFlagged(1, 1));
 }
+
+TEST_CASE("Copy Constructor") {
+    auto mfield = Minefield(8, 8, 10, 0);
+
+    mfield.open(0, 0);
+    mfield.flag(7, 7);
+    mfield.flag(6, 6);
+
+    auto second = Minefield(mfield);
+    auto third = mfield;
+
+    CHECK(second.isOpen(0, 0));
+
+    // compare programmatically
+    for(int x = 0; x < 8; x++) {
+        for (int y = 0; y < 8; y++) {
+            CHECK(second.isOpen(x, y) == mfield.isOpen(x, y));
+            CHECK(second.isFlagged(x, y) == mfield.isFlagged(x, y));
+
+            CHECK(third.isOpen(x, y) == mfield.isOpen(x, y));
+            CHECK(third.isFlagged(x, y) == mfield.isFlagged(x, y));
+        }
+    }
+}
