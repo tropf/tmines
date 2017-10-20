@@ -16,7 +16,7 @@ class Controller {
          * @param mine_count the mine count of the mine matrix
          * @param seed seed for the RNG
          */
-        Controller(int width, int height, int mine_count, int seed = 0);
+        Controller(int width = 8, int height = 8, int mine_count = 10, int seed = 0);
 
         /**
          * Returns the current X position of the cursor.

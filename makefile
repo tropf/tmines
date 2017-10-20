@@ -2,8 +2,8 @@ CC = g++
 CWARNINGS =  -Wall -Wextra
 COPTS = -std=c++17
 CFLAGS = $(COPTS) $(CWARNINGS) -g
-LINKERS = -Iextern/doctest -I.
-OBJECTS = minefield.o controller.o
+LINKERS = -Iextern/doctest -I. -lncurses
+OBJECTS = minefield.o controller.o display.o
 STATICFLAGS = -static -static-libgcc -static-libstdc++
 
 all: mines.cpp $(OBJECTS)
