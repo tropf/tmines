@@ -17,6 +17,10 @@ Minefield::Minefield(int dimension_x, int dimension_y, int mine_count, int seed)
         throw std::runtime_error("Given minecount doesn't fit on given X and Y dimensions");
     }
 
+    if (mine_count < 0) {
+        throw std::runtime_error("Given mine count can't be negative.");
+    }
+
     // init matrixes
     for (int x = 0; x < dimension_x; x++) {
         std::vector<bool> column;
@@ -281,4 +285,30 @@ int Minefield::getXDimension() {
 
 int Minefield::getYDimension() {
     return mines[0].size();
+}
+
+int Minefield::getMineCount() {
+    int sum = 0;
+    for (int x = 0; x < getXDimension(); x++) {
+        for (int y = 0; y < getYDimension(); y++) {
+            if (mines[x][y]) {
+                sum++;
+            }
+        }
+    }
+
+    return sum;
+}
+
+int Minefield::getFlagCount() {
+    int sum = 0;
+    for (int x = 0; x < getXDimension(); x++) {
+        for (int y = 0; y < getYDimension(); y++) {
+            if (flags[x][y]) {
+                sum++;
+            }
+        }
+    }
+
+    return sum;
 }

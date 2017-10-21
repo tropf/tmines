@@ -51,6 +51,9 @@ TEST_CASE("Constructor Test") {
 
     CHECK_NOTHROW(Minefield(10, 10, 100));
     CHECK_THROWS(Minefield(10, 10, 101));
+
+    CHECK_NOTHROW(Minefield(10, 10, 0));
+    CHECK_THROWS(Minefield(10, 10, -1));
 }
 
 TEST_CASE("Game State") {
@@ -333,4 +336,39 @@ TEST_CASE("Copy Constructor") {
             CHECK(third.isFlagged(x, y) == mfield.isFlagged(x, y));
         }
     }
+}
+
+TEST_CASE("Get Mine Count") {
+    auto mfield = Minefield(8, 8, 10);
+    CHECK(10 == mfield.getMineCount());
+
+    mfield = Minefield(8, 8, 13);
+    CHECK(13 == mfield.getMineCount());
+
+    mfield = Minefield(8, 8, 0);
+    CHECK(0 == mfield.getMineCount());
+
+    mfield = Minefield(8, 8, 17);
+    CHECK(17 == mfield.getMineCount());
+}
+
+TEST_CASE("Flag Count Test") {
+    auto mfield = Minefield(8, 8, 10);
+    
+    CHECK(0 == mfield.getFlagCount());
+
+    mfield.flag(0, 0);
+    CHECK(1 == mfield.getFlagCount());
+    mfield.flag(0, 0);
+    mfield.flag(1, 0);
+    CHECK(2 == mfield.getFlagCount());
+    mfield.flag(1, 0);
+    mfield.flag(1, 0);
+    CHECK(2 == mfield.getFlagCount());
+
+    mfield.unflag(0, 0);
+    CHECK(1 == mfield.getFlagCount());
+
+    mfield.flag(7, 6);
+    CHECK(2 == mfield.getFlagCount());
 }

@@ -158,6 +158,18 @@ class Minefield {
          * @return the height of the playing field
          */
         int getYDimension();
+
+        /**
+         * Returns the amount of all mines.
+         * @return amount of all mines
+         */
+        int getMineCount();
+
+        /**
+         * Returns the amount of placed flags.
+         * @return amount of placed flags
+         */
+        int getFlagCount();
 };
 
 #endif // __MINEFIELD_HPP_INCLUDED__
