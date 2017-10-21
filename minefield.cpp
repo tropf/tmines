@@ -264,9 +264,11 @@ void Minefield::open(int x, int y, bool recursive) {
                 done.push_back(coords_tuple);
 
                 // invoke self on sorrounding fields (no valid coord check, comes in next sub-call)
-                for (int dx = -1; dx <= 1; dx++) {
-                    for (int dy = -1; dy <= 1; dy++) {
-                        recursive_open(x + dx, y + dy, done);
+                for (int dx : {-1, 0, 1}) {
+                    for (int dy : {-1, 0, 1}) {
+                        if (isGameRunning()) {
+                            recursive_open(x + dx, y + dy, done);
+                        }
                     }
                 }
             }

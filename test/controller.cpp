@@ -284,3 +284,13 @@ TEST_CASE("Toggle Flag") {
     CHECK(! mfield.isOpen(6, 6));
     CHECK(! mfield.isFlagged(6, 6));
 }
+
+TEST_CASE("First Hit No Mine") {
+    auto con = Controller(8, 8, 10, 0);
+    CHECK_NOTHROW(con.click(0, 5));
+
+    auto mfield = con.getMinefield();
+
+    CHECK(! mfield.isGameLost());
+    CHECK(mfield.isGameRunning());
+}

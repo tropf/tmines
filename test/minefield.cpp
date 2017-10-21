@@ -314,6 +314,9 @@ TEST_CASE("Open Recursively") {
     CHECK(mfield.isFlagged(1, 1));
     mfield.open(0, 0);
     CHECK(! mfield.isFlagged(1, 1));
+
+    mfield = Minefield(8, 8, 1, 0);
+    CHECK_NOTHROW(mfield.open(0, 0));
 }
 
 TEST_CASE("Copy Constructor") {
@@ -421,6 +424,7 @@ TEST_CASE("First Hit No Mine") {
     mfield = Minefield(8, 8, 63, 0);
     mfield.open(0, 5);
     CHECK(! mfield.isGameLost());
+    CHECK(mfield.isGameWon());
 
     // unless there is a mine everywhere
     mfield = Minefield(8, 8, 64, 0);

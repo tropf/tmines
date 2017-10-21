@@ -5,6 +5,7 @@
 #include <iostream>
 #include <curses.h>
 #include <string>
+#include <locale.h>
 
 void Display::renderBoard() {
     auto mfield = controller.getMinefield();
@@ -24,9 +25,22 @@ void Display::renderBoard() {
                     color_set(11, 0);
                     to_print = 'X';
                 }
+            } else if (mfield.isGameEnded() && mfield.isMine(x, y) && !mfield.isFlagged(x, y)) {
+                // mark only unflagged mines
+                if (mfield.isGameWon()) {
+                    // mark less agressivley if won
+                    color_set(3, 0);
+                } else {
+                    color_set(11, 0);
+                }
+                to_print = 'X';
             } else if (mfield.isFlagged(x, y)) {
                 color_set(12, 0);
                 to_print = '?';
+                if (mfield.isGameEnded() && !mfield.isMine(x, y)) {
+                    // incorrect mine -> make red
+                    color_set(11, 0);
+                }
             } else {
                 color_set(10, 0);
                 to_print = '*';
@@ -91,7 +105,7 @@ int Display::getKey() {
 void Display::handleKey(int key) {
     if (113 == key) {
         exit = true;
-    } else if (' ' == key) {
+    } else if (' ' == key || KEY_ENTER == key) {
         controller.click();
     } else if ('w' == key || KEY_UP == key || 'W' == key || 'k' == key || 'K' == key) {
         controller.moveUp();
@@ -110,6 +124,12 @@ void Display::updateCursor() {
     int x, y;
     std::tie(x, y) = getConsolePosition(controller.getX(), controller.getY());
     move(y, x);
+
+    if (controller.getMinefield().isGameEnded()) {
+        curs_set(0);
+    } else {
+        curs_set(1);
+    }
 }
 
 void Display::run() {
@@ -127,7 +147,6 @@ void Display::run() {
     init_pair(12, COLOR_YELLOW, COLOR_BLACK);
     init_pair(13, COLOR_GREEN, COLOR_BLACK);
 
-
     bkgd(COLOR_PAIR(10));
 
     while(!exit) {
@@ -136,7 +155,6 @@ void Display::run() {
         renderBoard();
         renderStatusline();
         updateCursor();
-        curs_set(1);
         handleKey(getKey());
     }
 }
@@ -144,6 +162,8 @@ void Display::run() {
 Display::Display(int width, int height, int mine_count, int seed) {
     controller = Controller(width, height, mine_count, seed);
     exit = false;
+
+    setlocale (LC_ALL, "de_DE");
 
     initscr();
     noecho();
