@@ -13,23 +13,28 @@ void Display::renderBoard() {
         for (int y = 0; y < mfield.getYDimension(); y++) {
             char to_print;
             if (mfield.isOpen(x, y)) {
-                to_print = std::to_string(mfield.getSorroundingMineCount(x, y)).c_str()[0];
+                auto sourrounding_mine_count = mfield.getSorroundingMineCount(x, y);
+                color_set(sourrounding_mine_count, 0);
+                to_print = std::to_string(sourrounding_mine_count).c_str()[0];
                 if ('0' == to_print) {
                     to_print = ' ';
                 }
 
                 if (mfield.isMine(x, y)) {
+                    color_set(11, 0);
                     to_print = 'X';
                 }
             } else if (mfield.isFlagged(x, y)) {
+                color_set(12, 0);
                 to_print = '?';
             } else {
+                color_set(10, 0);
                 to_print = '*';
             }
 
             int x_to_print, y_to_print;
             std::tie(x_to_print, y_to_print) = getConsolePosition(x, y);
-            mvinsch(y_to_print, x_to_print, to_print);
+            mvaddch(y_to_print, x_to_print, to_print);
         }
     }
 }
@@ -39,7 +44,27 @@ std::tuple<int, int> Display::getConsolePosition(int x, int y) {
 }
 
 void Display::renderStatusline() {
+    std::string remaining_mines;
+    std::string game_state;
 
+    remaining_mines = "Verbleibende Minen: ";
+    auto mfield = controller.getMinefield();
+    if (mfield.isGameRunning()) {
+        color_set(12, 0);
+        game_state = "Spiel läuft";
+    } else {
+        if (mfield.isGameWon()) {
+            color_set(13, 0);
+            game_state = "Gewonnen     ";
+        } else {
+            color_set(11, 0);
+            game_state = "Verloren     ";
+        }
+    }
+
+    int x, y;
+    std::tie(x, y) = getConsolePosition(0, mfield.getYDimension() + 1);
+    mvaddstr(y, x, game_state.c_str());
 }
 
 int Display::getKey() {
@@ -47,10 +72,6 @@ int Display::getKey() {
 }
 
 void Display::handleKey(int key) {
-    std::string s = std::to_string(key);
-
-    mvprintw(3, 5, s.c_str());
-
     if (113 == key) {
         exit = true;
     } else if (32 == key) {
@@ -75,9 +96,25 @@ void Display::updateCursor() {
 }
 
 void Display::run() {
+    init_pair(0, COLOR_BLACK, COLOR_BLACK);
+    init_pair(1, COLOR_BLUE, COLOR_BLACK);
+    init_pair(2, COLOR_GREEN, COLOR_BLACK);
+    init_pair(3, COLOR_RED, COLOR_BLACK);
+    init_pair(4, COLOR_CYAN, COLOR_BLACK);
+    init_pair(5, COLOR_RED, COLOR_BLACK);
+    init_pair(6, COLOR_CYAN, COLOR_BLACK);
+    init_pair(7, COLOR_MAGENTA, COLOR_BLACK);
+    init_pair(8, COLOR_CYAN, COLOR_BLACK);
+    init_pair(10, COLOR_WHITE, COLOR_BLACK);
+    init_pair(11, COLOR_WHITE, COLOR_RED);
+    init_pair(12, COLOR_YELLOW, COLOR_BLACK);
+    init_pair(13, COLOR_GREEN, COLOR_BLACK);
+
+
+    bkgd(COLOR_PAIR(10));
+
     while(!exit) {
         // rendering process
-        clear();
         curs_set(0);
         renderBoard();
         renderStatusline();
@@ -93,7 +130,7 @@ Display::Display(int width, int height, int mine_count, int seed) {
 
     initscr();
     noecho();
-    curs_set(2);
+    start_color();
 
     run();
 
