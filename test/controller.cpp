@@ -3,6 +3,10 @@
 
 #include "controller.hpp"
 
+#include <tuple>
+#include <vector>
+#include <algorithm>
+
 TEST_CASE("Constructor Test") {
     auto con = Controller(8, 8, 10, 0);
     CHECK(8 == con.getWidth());
@@ -152,6 +156,96 @@ TEST_CASE("Click Test") {
     CHECK(! mfield.isOpen(6, 6));
 }
 
+TEST_CASE("Click autodiscover feature") {
+    // if an open field w/ a number is clicked
+    // and a corresponding number of flags is around
+    // all other fields should be opened
+
+    auto con = Controller(8, 8, 10, 0);
+
+    // left edge
+    CHECK_NOTHROW(con.click(0, 4));
+    CHECK_NOTHROW(con.click(0, 4));
+
+    // check nothing else is open
+    auto mfield = con.getMinefield();
+
+    CHECK(! mfield.isOpen(0, 3));
+    CHECK(! mfield.isOpen(1, 3));
+    CHECK(! mfield.isOpen(1, 4));
+    CHECK(! mfield.isOpen(1, 5));
+    CHECK(! mfield.isOpen(0, 5));
+    CHECK(mfield.isOpen(0, 4));
+    CHECK(1 == mfield.getSorroundingMineCount(0, 4));
+
+    CHECK_NOTHROW(con.tooggleFlag(0, 5));
+    mfield = con.getMinefield();
+
+    CHECK(! mfield.isOpen(0, 3));
+    CHECK(! mfield.isOpen(1, 3));
+    CHECK(! mfield.isOpen(1, 4));
+    CHECK(! mfield.isOpen(1, 5));
+    CHECK(! mfield.isOpen(0, 5));
+    CHECK(mfield.isOpen(0, 4));
+
+    // with disabled autodiscover
+    CHECK_NOTHROW(con.click(0, 5, false));
+    mfield = con.getMinefield();
+
+    CHECK(! mfield.isOpen(0, 3));
+    CHECK(! mfield.isOpen(1, 3));
+    CHECK(! mfield.isOpen(1, 4));
+    CHECK(! mfield.isOpen(1, 5));
+    CHECK(! mfield.isOpen(0, 5));
+    CHECK(mfield.isOpen(0, 4));
+
+    // enabled autodiscover
+    // this field displays 1 -> 1 flag has been placed -> click again -> open all other sorrounding fields
+    CHECK_NOTHROW(con.click(0, 4));
+    mfield = con.getMinefield();
+
+    CHECK(mfield.isOpen(0, 3));
+    CHECK(mfield.isOpen(1, 3));
+    CHECK(mfield.isOpen(1, 4));
+    CHECK(mfield.isOpen(1, 5));
+    CHECK(! mfield.isOpen(0, 5));
+    CHECK(mfield.isFlagged(0, 5));
+
+    // autodiscover on finished game
+    con = Controller(8, 8, 10, 0);
+    mfield = con.getMinefield();
+
+    std::vector<std::tuple<int, int>> mines = {
+        {5, 0},
+        {7, 3},
+        {3, 4},
+        {5, 4},
+        {6, 4},
+        {0, 5},
+        {3, 5},
+        {6, 5},
+        {6, 6},
+        {7, 6},
+    };
+
+    for (int x = 0; x < mfield.getXDimension(); x++) {
+        for (int y = 0; y < mfield.getYDimension(); y++) {
+            std::tuple<int, int> as_tuple = {x, y};
+            if (std::find(mines.begin(), mines.end(), as_tuple) == mines.end()) {
+                // has not been found -> can be opened
+                con.tooggleFlag(x, y);
+            }
+        }
+    }
+
+    // flag placed on every mine -> open every spot
+    for (int y = 0; y < mfield.getYDimension(); y++) {
+        for (int x = 0; x < mfield.getXDimension(); x++) {
+            CHECK_NOTHROW(con.click(x, y));
+        }
+    }
+}
+
 TEST_CASE("Toggle Flag") {
     auto con = Controller(8, 8, 10, 0);
 
@@ -189,8 +283,4 @@ TEST_CASE("Toggle Flag") {
     CHECK(! mfield.isGameRunning());
     CHECK(! mfield.isOpen(6, 6));
     CHECK(! mfield.isFlagged(6, 6));
-}
-
-TEST_CASE("Print Test") {
-    MESSAGE("TODO");
 }

@@ -81,6 +81,7 @@ class Controller {
          * Doesn't do anything if there is a flag on the field.
          * Doesn't do anything on already open fields.
          * Doesn't do anything after the game is over.
+         * Autodiscvoer is always enabled (see below).
          */
         void click();
 
@@ -89,10 +90,12 @@ class Controller {
          * Doesn't do anything if there is a flag on the field.
          * Doesn't do anything on already open fields.
          * Doesn't do anything after the game is over.
+         * Uses autodiscover: if all sorrounding mines are flagged, all other sorrounding spots are opened.
          * @param given_x x coordinate
          * @param given_y y coordinate
+         * @param autodiscover used to disable autodiscover
          */
-        void click(int given_x, int given_y);
+        void click(int given_x, int given_y, bool autodiscover = true);
 
         /**
          * Places or removes a flag from the current position.
@@ -109,11 +112,6 @@ class Controller {
          * @param given_y y coordinate
          */
         void tooggleFlag(int given_x, int given_y);
-
-        /**
-         * Prints the current game state
-         */
-        void print();
 
         /**
          * Returns the current mine field.

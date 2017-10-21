@@ -1,6 +1,6 @@
 #include "controller.hpp"
 
-#include <iostream>
+#include <tuple>
 
 Controller::Controller(int width, int height, int mine_count, int seed) {
     x = 0;
@@ -52,14 +52,39 @@ void Controller::click() {
     click(x, y);
 }
 
-void Controller::click(int given_x, int given_y) {
+void Controller::click(int given_x, int given_y, bool autodiscover) {
     // check pos
     if (mfield.isPosValid(given_x, given_y)) {
         // only do stuff while game is still running
         if (mfield.isGameRunning()) {
             // only click on fields w/o flags
             if(! mfield.isFlagged(given_x, given_y)) {
-                mfield.open(given_x, given_y);
+                if (autodiscover && mfield.isOpen(given_x, given_y)) {
+                    // already open -> autodiscover
+                    // if all sorrounding mines are flagged -> open all other sorrounding fields
+                    int flag_count = 0;
+                    for (int dx : {-1, 0, 1}) {
+                        for (int dy: {-1, 0, 1}) {
+                            if (mfield.isPosValid(given_x + dx, given_y + dy)) {
+                                if (mfield.isFlagged(given_x + dx, given_y + dy)) {
+                                    flag_count++;
+                                }
+                            }
+                        }
+                    }
+
+                    // don't treat 0 sorrounding mines, because handled by open function
+                    if (0 != flag_count && mfield.getSorroundingMineCount(given_x, given_y) == flag_count) {
+                        for (int dx : {-1, 0, 1}) {
+                            for (int dy: {-1, 0, 1}) {
+                                click(given_x + dx, given_y + dy, false);
+                            }
+                        }
+                    }
+                } else {
+                    // no autodiscover -> open regularly
+                    mfield.open(given_x, given_y);
+                }
             }
         }
     }
@@ -84,37 +109,6 @@ void Controller::tooggleFlag(int given_x, int given_y) {
                 }
             }
         }
-    }
-}
-
-void Controller::print() {
-    for (int current_y = 0; current_y < mfield.getYDimension(); current_y++) {
-        for (int current_x = 0; current_x < mfield.getXDimension(); current_x++) {
-            if ((x == current_x) && (y == current_y)) {
-                std::cout << "[";
-            } else {
-                std::cout << " ";
-            }
-
-            if (mfield.isFlagged(current_x, current_y)) {
-                std::cout << "?";
-            } else if (! mfield.isOpen(current_x, current_y)) {
-                std::cout << "*";
-            } else if (mfield.isMine(current_x, current_y)) {
-                std::cout << "X";
-            } else if (0 == mfield.getSorroundingMineCount(current_x, current_y)) {
-                std::cout << " ";
-            } else {
-                std::cout << mfield.getSorroundingMineCount(current_x, current_y);
-            }
-
-            if (x == current_x && y == current_y) {
-                std::cout << "]";
-            } else {
-                std::cout << " ";
-            }
-        }
-        std::cout << std::endl;
     }
 }
 
