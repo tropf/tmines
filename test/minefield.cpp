@@ -68,6 +68,8 @@ TEST_CASE("Game State") {
     CHECK(! mfield.isGameLost());
 
     // open a mine
+    // (open a non-mine first because first hit can never be a mine)
+    mfield.open(0, 0, false);
     mfield.open(0, 5, false);
     // mine hit (by accident)
     CHECK(mfield.isGameEnded());
@@ -371,4 +373,56 @@ TEST_CASE("Flag Count Test") {
 
     mfield.flag(7, 6);
     CHECK(2 == mfield.getFlagCount());
+}
+
+TEST_CASE("Open Count Test") {
+    auto mfield = Minefield(8, 8, 10, 0);
+
+    // don't use recursive opening of fields
+    CHECK(0 == mfield.getOpenCount());
+    mfield.open(0, 0, false);
+    mfield.open(0, 0, false);
+    mfield.open(0, 0, false);
+
+    CHECK(1 == mfield.getOpenCount());
+
+    mfield.open(0, 1, false);
+    mfield.open(0, 2, false);
+    mfield.open(0, 3, false);
+
+    CHECK(4 == mfield.getOpenCount());
+
+    mfield.open(2, 2, false);
+
+    CHECK(5 == mfield.getOpenCount());
+
+    mfield.open(6, 6, false);
+
+    CHECK(6 == mfield.getOpenCount());
+}
+
+TEST_CASE("First Hit No Mine") {
+    // Test: firts hit can never be a mine
+    auto mfield = Minefield(8, 8, 10, 0);
+
+    // normal behaviour
+    mfield.open(0, 0);
+    CHECK(! mfield.isGameLost());
+
+    mfield.open(0, 5);
+    CHECK(mfield.isGameLost());
+
+    // don't die instantly on a mine
+    mfield = Minefield(8, 8, 10, 0);
+    mfield.open(0, 5);
+    CHECK(! mfield.isGameLost());
+
+    // don't die instantly on a mine, even if only 1 spot is left
+    mfield = Minefield(8, 8, 63, 0);
+    mfield.open(0, 5);
+    CHECK(! mfield.isGameLost());
+
+    // unless there is a mine everywhere
+    mfield = Minefield(8, 8, 64, 0);
+    CHECK(! mfield.isGameRunning());
 }

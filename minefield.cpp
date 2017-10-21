@@ -54,7 +54,8 @@ Minefield::Minefield(int dimension_x, int dimension_y, int mine_count, int seed)
     int random_max = positions.size() - 1;
 
     for (int current_mine_num = 0; current_mine_num < mine_count; current_mine_num++) {
-        std::uniform_int_distribution<> distr(random_min, random_max); int chosen_index = distr(rdm_num_machine);
+        std::uniform_int_distribution<> distr(random_min, random_max);
+        int chosen_index = distr(rdm_num_machine);
         int chosen_pos = positions[chosen_index];
 
         // resolve chosen spot
@@ -212,6 +213,33 @@ void Minefield::open(int x, int y, bool recursive) {
         throw std::runtime_error("Can't open given position, flag is placed.");
     }
 
+    // check if is first spot to be opened
+    if (mines[x][y] && 0 == getOpenCount()) {
+        // move this mine to another open place
+        std::vector<std::tuple<int, int>> emptySpots;
+        for (int lx = 0; lx < getXDimension(); lx++) {
+            for (int ly = 0; ly < getYDimension(); ly++) {
+                if (! mines[lx][ly]) {
+                    emptySpots.push_back(std::make_tuple(lx, ly));
+                }
+            }
+        }
+
+        // pick random empty spot
+        if (0 < emptySpots.size()) {
+            std::mt19937 rdm_num_machine(x * getYDimension() + y);
+            std::uniform_int_distribution<> distr(0, emptySpots.size() - 1);
+            int chosen_index = distr(rdm_num_machine);
+
+            int chosen_x, chosen_y;
+            std::tie(chosen_x, chosen_y) = emptySpots[chosen_index];
+
+            // move mines
+            mines[chosen_x][chosen_y] = true;
+            mines[x][y] = false;
+        }
+    }
+
     opened[x][y] = true;
 
     if (recursive && !isMine(x, y) && (0 == getSorroundingMineCount(x, y))) {
@@ -287,11 +315,11 @@ int Minefield::getYDimension() {
     return mines[0].size();
 }
 
-int Minefield::getMineCount() {
+int getTrueCount(std::vector<std::vector<bool>> matrix) {
     int sum = 0;
-    for (int x = 0; x < getXDimension(); x++) {
-        for (int y = 0; y < getYDimension(); y++) {
-            if (mines[x][y]) {
+    for (unsigned long x = 0; x < matrix.size(); x++) {
+        for (unsigned long y = 0; y < matrix[x].size(); y++) {
+            if (matrix[x][y]) {
                 sum++;
             }
         }
@@ -300,15 +328,14 @@ int Minefield::getMineCount() {
     return sum;
 }
 
-int Minefield::getFlagCount() {
-    int sum = 0;
-    for (int x = 0; x < getXDimension(); x++) {
-        for (int y = 0; y < getYDimension(); y++) {
-            if (flags[x][y]) {
-                sum++;
-            }
-        }
-    }
+int Minefield::getMineCount() {
+    return getTrueCount(mines);
+}
 
-    return sum;
+int Minefield::getFlagCount() {
+    return getTrueCount(flags);
+}
+
+int Minefield::getOpenCount() {
+    return getTrueCount(opened);
 }

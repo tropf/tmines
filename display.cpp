@@ -46,25 +46,42 @@ std::tuple<int, int> Display::getConsolePosition(int x, int y) {
 void Display::renderStatusline() {
     std::string remaining_mines;
     std::string game_state;
+    short color_to_use = 0;
 
     remaining_mines = "Verbleibende Minen: ";
     auto mfield = controller.getMinefield();
+    if (mfield.isGameWon() || mfield.getFlagCount() > mfield.getMineCount()) {
+        remaining_mines += "0";
+    } else {
+        remaining_mines += std::to_string(mfield.getMineCount() - mfield.getFlagCount());
+    }
     if (mfield.isGameRunning()) {
-        color_set(12, 0);
+        color_to_use = 12;
         game_state = "Spiel läuft";
     } else {
         if (mfield.isGameWon()) {
-            color_set(13, 0);
-            game_state = "Gewonnen     ";
+            color_to_use = 13;
+            game_state = "Gewonnen";
         } else {
-            color_set(11, 0);
-            game_state = "Verloren     ";
+            color_to_use = 11;
+            game_state = "Verloren";
         }
     }
 
     int x, y;
     std::tie(x, y) = getConsolePosition(0, mfield.getYDimension() + 1);
+
+    color_set(0, 0);
+    mvaddstr(y, x, "                          ");
+
+    color_set(color_to_use, 0);
     mvaddstr(y, x, game_state.c_str());
+
+    std::tie(x, y) = getConsolePosition(0, mfield.getYDimension() + 2);
+    color_set(0, 0);
+    mvaddstr(y, x, "                          ");
+    color_set(12, 0);
+    mvaddstr(y, x, remaining_mines.c_str());
 }
 
 int Display::getKey() {
@@ -74,17 +91,17 @@ int Display::getKey() {
 void Display::handleKey(int key) {
     if (113 == key) {
         exit = true;
-    } else if (32 == key) {
+    } else if (' ' == key) {
         controller.click();
-    } else if (119 == key) {
+    } else if ('w' == key || KEY_UP == key || 'W' == key || 'k' == key || 'K' == key) {
         controller.moveUp();
-    } else if (97 == key) {
+    } else if ('a' == key || KEY_LEFT == key || 'A' == key || 'h' == key || 'H' == key) {
         controller.moveLeft();
-    } else if (115 == key) {
+    } else if ('s' == key || KEY_DOWN == key || 'S' == key || 'j' == key || 'J' == key) {
         controller.moveDown();
-    } else if (100 == key) {
+    } else if ('d' == key || KEY_RIGHT == key || 'D' == key || 'l' == key || 'L' == key) {
         controller.moveRight();
-    } else if (102 == key) {
+    } else if ('f' == key || 'F' == key) {
         controller.tooggleFlag();
     }
 }
@@ -96,7 +113,7 @@ void Display::updateCursor() {
 }
 
 void Display::run() {
-    init_pair(0, COLOR_BLACK, COLOR_BLACK);
+    init_pair(0, COLOR_WHITE, COLOR_BLACK);
     init_pair(1, COLOR_BLUE, COLOR_BLACK);
     init_pair(2, COLOR_GREEN, COLOR_BLACK);
     init_pair(3, COLOR_RED, COLOR_BLACK);
@@ -131,6 +148,8 @@ Display::Display(int width, int height, int mine_count, int seed) {
     initscr();
     noecho();
     start_color();
+    keypad(stdscr, TRUE);
+    cbreak();
 
     run();
 

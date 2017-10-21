@@ -170,6 +170,12 @@ class Minefield {
          * @return amount of placed flags
          */
         int getFlagCount();
+
+        /**
+         * Returns the amount of opened fields.
+         * @return amount of opened fields
+         */
+        int getOpenCount();
 };
 
 #endif // __MINEFIELD_HPP_INCLUDED__
