@@ -430,3 +430,18 @@ TEST_CASE("First Hit No Mine") {
     mfield = Minefield(8, 8, 64, 0);
     CHECK(! mfield.isGameRunning());
 }
+
+TEST_CASE("save seed test") {
+    // Test: given seed is saved
+    auto mfield = Minefield(8, 8, 10, 0);
+    CHECK(0 == mfield.getSeed());
+
+    mfield = Minefield(8, 8, 10, 213212312);
+    CHECK(213212312 == mfield.getSeed());
+
+    mfield = Minefield(10, 100, 10, 213212312);
+    CHECK(213212312 == mfield.getSeed());
+
+    mfield = Minefield(10, 100, 10, 1234567890);
+    CHECK(21234567890 == mfield.getSeed());
+}

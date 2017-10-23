@@ -8,6 +8,7 @@ class Minefield {
         std::vector<std::vector<bool>> mines;
         std::vector<std::vector<bool>> flags;
         std::vector<std::vector<bool>> opened;
+        int given_seed;
         
         /**
          * Throws if given position is invalid.
@@ -176,6 +177,12 @@ class Minefield {
          * @return amount of opened fields
          */
         int getOpenCount();
+
+        /**
+         * Returns the seed the RNG has been initialized w/
+         * @return seed given on creation
+         */
+        int getSeed();
 };
 
 #endif // __MINEFIELD_HPP_INCLUDED__

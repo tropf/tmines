@@ -33,6 +33,7 @@ Minefield::Minefield(int dimension_x, int dimension_y, int mine_count, int seed)
     }
 
     // seed randomizer
+    given_seed = seed;
     
     //A Mersenne Twister pseudo-random generator of 32-bit numbers with a state size of 19937 bits.
     std::mt19937 rdm_num_machine(seed);
@@ -256,7 +257,9 @@ void Minefield::open(int x, int y, bool recursive) {
             // remove flags (as only safe spots get opened via this function this is safe to do)
             flags[x][y] = false; 
             // not been visited => open (non-recursively)
-            open(x, y, false);
+            if (isGameRunning()) {
+                open(x, y, false);
+            }
 
             // only carry on if self has no sorrounding mines
             if (0 == getSorroundingMineCount(x, y)) {
@@ -340,4 +343,8 @@ int Minefield::getFlagCount() {
 
 int Minefield::getOpenCount() {
     return getTrueCount(opened);
+}
+
+int Minefield::getSeed() {
+    return given_seed;
 }
