@@ -24,7 +24,7 @@ static int parse_opt(int key, char* arg, struct argp_state* state) {
     switch (key) {
         case 'x':
         case 'w':
-            if (has_only_digits(arg) && "0" != std::string(arg)) {
+            if (has_only_digits(arg)) {
                 opts.width = std::atoi(arg);
             } else {
                 argp_failure(state, 1, 0, "Argument must be number");
@@ -33,7 +33,7 @@ static int parse_opt(int key, char* arg, struct argp_state* state) {
         
         case 'y':
         case 'h':
-            if (has_only_digits(arg) && "0" != std::string(arg)) {
+            if (has_only_digits(arg)) {
                 opts.height = std::atoi(arg);
             } else {
                 argp_failure(state, 1, 0, "Argument must be number");
@@ -41,7 +41,7 @@ static int parse_opt(int key, char* arg, struct argp_state* state) {
             break;
 
         case 'c':
-            if (has_only_digits(arg) && "0" != std::string(arg)) {
+            if (has_only_digits(arg)) {
                 opts.mine_count = std::atoi(arg);
             } else {
                 argp_failure(state, 1, 0, "Argument must be number");
@@ -49,7 +49,7 @@ static int parse_opt(int key, char* arg, struct argp_state* state) {
             break;
 
         case 's':
-            if (has_only_digits(arg) && "0" != std::string(arg)) {
+            if (has_only_digits(arg)) {
                 opts.seed = std::atoi(arg);
             } else {
                 argp_failure(state, 1, 0, "Argument must be number");
@@ -76,6 +76,10 @@ void run() {
         endwin();
         std::cout << "Unfortunately, an error occured:" << std::endl;
         std::cout << e.what() << std::endl;
+        std::cout << "Settings:" << std::endl;
+        std::cout << "Width, Height: " << opts.width << ", " << opts.height << std::endl;
+        std::cout << "Mine Count:    " << opts.mine_count << std::endl;
+        std::cout << "Seed:          " << opts.seed << std::endl;
     }
 }
 
