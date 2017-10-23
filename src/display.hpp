@@ -4,16 +4,39 @@
 #include "controller.hpp"
 
 #include <tuple>
+#include <string>
+#include <vector>
 
 class Display {
     private:
         Controller controller;
         bool exit;
+        std::vector<std::vector<std::tuple<int, char>>> state, last_state;
+
+        const struct {
+            std::string won = "won";
+            std::string lost = "lost";
+            std::string running = "live";
+            std::string remaining_mines = "%mine_count% mines remaining";
+        } msgs;
 
         /**
-         * Renders the Board of the Game
+         * Renders the Board of the Game according to state var.
          */
         void renderBoard();
+
+        /**
+         * Calculates how the board should be rendered.
+         * Writes what to render into the state var.
+         * Actually Print anything
+         */
+        void calculateStates();
+
+        /**
+         * Calculates and returns the width of the longest text (in the status bar)
+         * @return width of the longest text
+         */
+        int getMaxTextWidth();
 
         /**
          * Renders a status bar below the Game board
@@ -49,6 +72,12 @@ class Display {
          * @return tuple containg x and y coordinate on the console
          */
         std::tuple<int, int> getConsolePosition(int x, int y);
+
+        /**
+         * Checks if the current window size is sufficient to display mine field.
+         * Throws if the check fails.
+         */
+        void checkWindowSize();
 
     public:
         /**
