@@ -7,6 +7,8 @@
 #include <string>
 #include <algorithm>
 
+#include <chrono>
+
 void Display::renderBoard() {
     auto mfield = controller.getMinefield();
     for (int x = 0; x < mfield.getXDimension(); x++) {
@@ -209,7 +211,7 @@ void Display::checkWindowSize() {
     required_height++;
 
     if (LINES < required_height || COLS < required_width) {
-        throw std::runtime_error(std::to_string(required_width) + "x" + std::to_string(required_height) + " terminal required to display this minefield");
+        throw std::runtime_error(std::to_string(required_width) + "x" + std::to_string(required_height) + " terminal required to display this minefield (Current: " + std::to_string(COLS) + "x" + std::to_string(LINES) + ")");
     }
 }
 
@@ -232,15 +234,30 @@ void Display::run() {
 
     checkWindowSize();
 
+    unsigned long calc_time = 0;
+    unsigned long draw_time = 0;
+    unsigned long handle_time = 0;
+
     while(!exit) {
         // rendering process
         curs_set(0);
+        auto time_before_calc = std::chrono::system_clock::now();
         calculateStates();
+        auto time_before_render = std::chrono::system_clock::now();
         renderBoard();
+        auto time_after_render = std::chrono::system_clock::now();
         renderStatusline();
         updateCursor();
+        auto time_before_handle = std::chrono::system_clock::now();
         handleKey(getKey());
+        auto time_after_handle = std::chrono::system_clock::now();
+
+        calc_time += std::chrono::duration_cast<std::chrono::nanoseconds>(time_before_render - time_before_calc).count();
+        draw_time += std::chrono::duration_cast<std::chrono::nanoseconds>(time_after_render - time_before_render).count();
+        handle_time += std::chrono::duration_cast<std::chrono::nanoseconds>(time_after_handle - time_before_handle).count();
     }
+
+    throw std::runtime_error("Calc Time:\t" + std::to_string(calc_time) + " ns\nRender Time:\t" + std::to_string(draw_time) + " ns\nHandle Time:\t" + std::to_string(handle_time) + " ns");
 }
 
 Display::Display(int width, int height, int mine_count, int seed) {
