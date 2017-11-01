@@ -26,6 +26,10 @@ Minefield::Minefield(int dimension_x, int dimension_y, int mine_count, int seed)
     given_mine_count = mine_count;
     given_x_dimension = dimension_x;
     given_y_dimension = dimension_y;
+
+    // init caching vars
+    open_cnt = 0;
+    opened_mine = false;
     
     // init matrixes
     for (int x = 0; x < dimension_x; x++) {
@@ -101,18 +105,16 @@ bool Minefield::isGameRunning() {
     // 2. there is a field to be opened that is not a mine
     
     // no mine opened
-    for (int x = 0; x < getXDimension(); x++) {
-        for (int y = 0; y < getYDimension(); y++) {
-            if(mines[x][y] && opened[x][y]) {
-                return false;
-            }
-        }
+    if (opened_mine) {
+        return false;
     }
 
     // an open field w/o mine exists
+    // -> more fields to open than mines remaining
+    return ((getXDimension() * getYDimension()) - open_cnt) > given_mine_count;
     for (int x = 0; x < getXDimension(); x++) {
         for (int y = 0; y < getYDimension(); y++) {
-            if((! mines[x][y]) && (! opened[x][y])) {
+            if((! mines[x][y]) && (! isOpen(x, y))) {
                 return true;
             }
          }
@@ -131,7 +133,7 @@ bool Minefield::isGameWon() {
     // -> no field opened w/o mine
     for (int x = 0; x < getXDimension(); x++) {
         for (int y = 0; y < getYDimension(); y++) {
-            if ((! opened[x][y]) && (! mines[x][y])) {
+            if ((! isOpen(x, y)) && (! mines[x][y])) {
                 // field w/o mine has not been opened
                 return false;
             }
@@ -150,7 +152,7 @@ bool Minefield::isGameLost() {
     // there is a field w/ a mine that has been opened
     for (int x = 0; x < getXDimension(); x++) {
         for (int y = 0; y < getYDimension(); y++) {
-            if (mines[x][y] && opened[x][y]) {
+            if (mines[x][y] && isOpen(x, y)) {
                 return true;
             }
         }
@@ -177,7 +179,7 @@ bool Minefield::isFlagged(int x, int y) {
 
 bool Minefield::isMine(int x, int y) {
     checkPos(x, y);
-    if (isGameRunning() && ! opened[x][y]) {
+    if (isGameRunning() && ! isOpen(x, y)) {
         throw std::runtime_error("Can't check if is mine on not-opened field.");
     }
 
@@ -193,7 +195,7 @@ void Minefield::flag(int x, int y) {
     checkPos(x, y);
     checkRunning();
 
-    if (opened[x][y]) {
+    if (isOpen(x, y)) {
         throw std::runtime_error("Can't place flag on opened field.");
     }
     flags[x][y] = true;
@@ -203,7 +205,7 @@ void Minefield::unflag(int x, int y) {
     checkPos(x, y);
     checkRunning();
 
-    if (opened[x][y]) {
+    if (isOpen(x, y)) {
         throw std::runtime_error("Can't remove flag on opened field.");
     }
 
@@ -245,7 +247,19 @@ void Minefield::open(int x, int y, bool recursive) {
         }
     }
 
-    opened[x][y] = true;
+    // recursive open? -> redirect to non-recursive open for counting purposes
+    if (recursive) {
+        open(x, y, false);
+    } else {
+        if (! opened[x][y]) {
+            opened[x][y] = true;
+            open_cnt++;
+
+            if (isMine(x, y)) {
+                opened_mine = true;
+            }
+        }
+    }
 
     if (recursive && !isMine(x, y) && (0 == getSorroundingMineCount(x, y))) {
         std::function<bool (int, int, std::vector<std::tuple<int, int>>&)> recursive_open = [&](int x, int y, std::vector<std::tuple<int, int>>& done){
@@ -291,7 +305,7 @@ void Minefield::open(int x, int y, bool recursive) {
 int Minefield::getSorroundingMineCount(int x, int y) {
     checkPos(x, y);
     
-    if (isGameRunning() && ! opened[x][y]) {
+    if (isGameRunning() && ! isOpen(x, y)) {
         throw std::runtime_error("Can't display sorrounding mines on unopened field while game is still running.");
     }
 
@@ -346,7 +360,7 @@ int Minefield::getFlagCount() {
 }
 
 int Minefield::getOpenCount() {
-    return getTrueCount(opened);
+    return open_cnt;
 }
 
 int Minefield::getSeed() {

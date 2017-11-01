@@ -12,6 +12,8 @@ class Minefield {
         int given_mine_count;
         int given_x_dimension;
         int given_y_dimension;
+        int open_cnt;
+        bool opened_mine;
         
         /**
          * Throws if given position is invalid.
