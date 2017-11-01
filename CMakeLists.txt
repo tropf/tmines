@@ -48,9 +48,14 @@ install(TARGETS tmines DESTINATION bin)
 
 if (build_tests)
     enable_testing()
-
     include_directories(extern/doctest)
+
     add_executable(minefield_test test/minefield.cpp)
     target_link_libraries(minefield_test minefield)
     add_test(minefield_test minefield_test)
+
+    add_executable(controller_test test/controller.cpp)
+    target_link_libraries(controller_test controller)
+    target_link_libraries(controller_test minefield)
+    add_test(controller_test controller_test)
 endif()
