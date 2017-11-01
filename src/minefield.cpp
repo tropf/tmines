@@ -21,6 +21,12 @@ Minefield::Minefield(int dimension_x, int dimension_y, int mine_count, int seed)
         throw std::runtime_error("Given mine count can't be negative.");
     }
 
+    // error checks ok, save params
+    given_seed = seed;
+    given_mine_count = mine_count;
+    given_x_dimension = dimension_x;
+    given_y_dimension = dimension_y;
+    
     // init matrixes
     for (int x = 0; x < dimension_x; x++) {
         std::vector<bool> column;
@@ -33,8 +39,6 @@ Minefield::Minefield(int dimension_x, int dimension_y, int mine_count, int seed)
     }
 
     // seed randomizer
-    given_seed = seed;
-    
     //A Mersenne Twister pseudo-random generator of 32-bit numbers with a state size of 19937 bits.
     std::mt19937 rdm_num_machine(seed);
 
@@ -313,11 +317,11 @@ int Minefield::getSorroundingMineCount(int x, int y) {
 }
 
 int Minefield::getXDimension() {
-    return mines.size();
+    return given_x_dimension;
 }
 
 int Minefield::getYDimension() {
-    return mines[0].size();
+    return given_y_dimension;
 }
 
 int getTrueCount(std::vector<std::vector<bool>> matrix) {
@@ -334,7 +338,7 @@ int getTrueCount(std::vector<std::vector<bool>> matrix) {
 }
 
 int Minefield::getMineCount() {
-    return getTrueCount(mines);
+    return given_mine_count;
 }
 
 int Minefield::getFlagCount() {

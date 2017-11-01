@@ -9,6 +9,9 @@ class Minefield {
         std::vector<std::vector<bool>> flags;
         std::vector<std::vector<bool>> opened;
         int given_seed;
+        int given_mine_count;
+        int given_x_dimension;
+        int given_y_dimension;
         
         /**
          * Throws if given position is invalid.
