@@ -443,5 +443,5 @@ TEST_CASE("save seed test") {
     CHECK(213212312 == mfield.getSeed());
 
     mfield = Minefield(10, 100, 10, 1234567890);
-    CHECK(21234567890 == mfield.getSeed());
+    CHECK(1234567890 == mfield.getSeed());
 }
