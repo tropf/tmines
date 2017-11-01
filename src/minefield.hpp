@@ -36,7 +36,9 @@ class Minefield {
          * Given Dimensions must both be >0
          * @param dimension_x amount of columns, index: 0..dimension_x-1
          * @param dimension_y amount of rows, index: 0..dimension_y-1
-         * @throws std::exception if dimension_x or dimension_y are 0 or less
+         * @param mine_count amount of mines to be placed
+         * @param seed seed to initialize the random number generator
+         * @throws std::exception if dimension_x or dimension_y are 0 or less, more mines should be placed than spots are available
          */
         Minefield(int dimension_x = 8, int dimension_y = 8, int mine_count = 10, int seed = 0);
         
@@ -134,6 +136,7 @@ class Minefield {
          * If recursive is set to false, only one field will be opened.
          * @param x x coordinate
          * @param y y coordinate
+         * @param recursive will open sorrounding fields if current field has no sorrounding mines
          * @throws std::exception if the game is not running or given position is invalid or position is flagged
          */
         void open(int x, int y, bool recursive = true);
