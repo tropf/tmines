@@ -6,6 +6,22 @@ set (TerminalMines_VERSION_MAJOR 0)
 set (TerminalMines_VERSION_MINOR 9)
 set(CMAKE_CXX_STANDARD 14)
 
+option(build_tests "build tests alongside the project" OFF)
+option(debug "build with gdb debugging symbols" OFF)
+option(profiling "build with gprof profiling enabled" OFF)
+
+if (profiling)
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pg -no-pie")
+    SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pg -no-pie")
+    SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -pg -no-pie")
+endif()
+
+if (debug)
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
+    SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -g")
+    SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -g")
+endif()
+
 configure_file(
     "${PROJECT_SOURCE_DIR}/src/config.h.in"
     "${PROJECT_BINARY_DIR}/src/config.h"
@@ -29,3 +45,12 @@ target_link_libraries(tmines minefield)
 target_link_libraries(tmines ${CURSES_LIBRARIES})
 
 install(TARGETS tmines DESTINATION bin)
+
+if (build_tests)
+    enable_testing()
+
+    include_directories(extern/doctest)
+    add_executable(minefield_test test/minefield.cpp)
+    target_link_libraries(minefield_test minefield)
+    add_test(minefield_test minefield_test)
+endif()
