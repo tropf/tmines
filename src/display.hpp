@@ -86,8 +86,9 @@ class Display {
          * @param height the height of the mine matrix
          * @param mine_count the mine count of the mine matrix
          * @param seed seed for the RNG
+         * @param autodiscover_only if enabled, fields cannot be opened directly
          */
-        Display(int width, int height, int mine_count, int seed = 0);
+        Display(int width, int height, int mine_count, int seed = 0, bool autodiscover_only = false);
 };
 
 #endif //__DIPLAY_H_INCLUDED__

@@ -294,3 +294,44 @@ TEST_CASE("First Hit No Mine") {
     CHECK(! mfield.isGameLost());
     CHECK(mfield.isGameRunning());
 }
+
+TEST_CASE("Don't open on direct click") {
+    // enable only opening via autodiscover
+    auto con = Controller(8, 8, 10, 0, true);
+    CHECK_NOTHROW(con.click(4, 0));
+
+    // first field can be opened directly
+    auto mfield = con.getMinefield();
+    CHECK(mfield.isOpen(4, 0));
+    CHECK(! mfield.isOpen(3, 0));
+    CHECK(! mfield.isOpen(5, 0));
+    CHECK(! mfield.isOpen(3, 1));
+    CHECK(! mfield.isOpen(4, 1));
+    CHECK(! mfield.isOpen(5, 1));
+
+    // after that clicking doesn't do anything
+    CHECK_NOTHROW(con.click(5, 0));
+
+    mfield = con.getMinefield();
+    CHECK(mfield.isOpen(4, 0));
+    CHECK(! mfield.isOpen(3, 0));
+    CHECK(! mfield.isOpen(5, 0));
+    CHECK(! mfield.isOpen(3, 1));
+    CHECK(! mfield.isOpen(4, 1));
+    CHECK(! mfield.isOpen(5, 1));
+
+    // do something after flagging
+    CHECK_NOTHROW(con.tooggleFlag(5, 0));
+    CHECK_NOTHROW(con.click(4, 0));
+
+    // everthing has been opened
+    mfield = con.getMinefield();
+    CHECK(mfield.isOpen(4, 0));
+    CHECK(mfield.isOpen(3, 0));
+    CHECK(mfield.isOpen(3, 1));
+    CHECK(mfield.isOpen(4, 1));
+    CHECK(mfield.isOpen(5, 1));
+
+    CHECK(! mfield.isOpen(5, 0));
+    CHECK(mfield.isFlagged(5, 0));
+}

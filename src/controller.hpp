@@ -7,6 +7,7 @@ class Controller {
     private:
         Minefield mfield;
         int x, y;
+        bool autodiscover_only;
     public:
         /**
          * Initializes a new Controller.
@@ -15,8 +16,9 @@ class Controller {
          * @param height the height of the mine matrix
          * @param mine_count the mine count of the mine matrix
          * @param seed seed for the RNG
+         * @param only_autodiscover if set: will not allow to open field directly, only via autodiscover (see below)
          */
-        Controller(int width = 8, int height = 8, int mine_count = 10, int seed = 0);
+        Controller(int width = 8, int height = 8, int mine_count = 10, int seed = 0, bool only_autodiscover = false);
 
         /**
          * Returns the current X position of the cursor.

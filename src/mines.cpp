@@ -14,6 +14,7 @@ struct {
     int height = 8;
     int mine_count = -1;
     int seed = -1;
+    bool autodiscover_only = false;
 } opts;
 
 bool has_only_digits(const std::string s){
@@ -55,6 +56,10 @@ static int parse_opt(int key, char* arg, struct argp_state* state) {
                 argp_failure(state, 1, 0, "Argument must be number");
             }
             break;
+
+        case 'a':
+            opts.autodiscover_only = true;
+            break;
     }
 
     return 0;
@@ -71,7 +76,7 @@ void run() {
     }
     
     try {
-        Display(opts.width, opts.height, opts.mine_count, opts.seed);
+        Display(opts.width, opts.height, opts.mine_count, opts.seed, opts.autodiscover_only);
     } catch (std::exception& e) {
         endwin();
         std::cout << "Unfortunately, an error occured:" << std::endl;
@@ -91,6 +96,7 @@ int main(int argc, char** argv) {
         {0, 'y', 0, OPTION_ALIAS, 0, 0},
         {"mine-count", 'c', "NUM", 0, "number of mines to be placed, default: 16%", 0},
         {"count", 0, 0, OPTION_ALIAS, 0, 0},
+        {"autodiscover-only", 'a', 0, 0, "if enabled: fields can only be opened using autodiscover feature (see man)", 0},
         {"seed", 's', "NUM", 0, "seed for field generation, suitable seed will be chosen by automatically", 0},
         {0, 0, 0, 0, 0, 0}
     };

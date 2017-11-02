@@ -260,8 +260,8 @@ void Display::run() {
     throw std::runtime_error("Calc Time:\t" + std::to_string(calc_time) + " ns\nRender Time:\t" + std::to_string(draw_time) + " ns\nHandle Time:\t" + std::to_string(handle_time) + " ns");
 }
 
-Display::Display(int width, int height, int mine_count, int seed) {
-    controller = Controller(width, height, mine_count, seed);
+Display::Display(int width, int height, int mine_count, int seed, bool autodiscover_only) {
+    controller = Controller(width, height, mine_count, seed, autodiscover_only);
     exit = false;
 
     // init state vars
