@@ -6,8 +6,6 @@ set (TerminalMines_VERSION_MAJOR 0)
 set (TerminalMines_VERSION_MINOR 9)
 set(CMAKE_CXX_STANDARD 14)
 
-add_subdirectory(doc)
-
 option(build_tests "build tests alongside the project" OFF)
 option(debug "build with gdb debugging symbols" OFF)
 option(profiling "build with gprof profiling enabled" OFF)
@@ -40,6 +38,8 @@ find_package(Curses REQUIRED)
 include_directories(${CURSES_INCLUDE_DIRS})
 
 add_executable(tmines src/mines.cpp)
+
+add_subdirectory(doc)
 
 target_link_libraries(tmines display)
 target_link_libraries(tmines controller)

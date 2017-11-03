@@ -3,6 +3,14 @@
 
 #include <vector>
 
+/**
+ * The minefield class impplements the basic functionality of minesweeper.
+ * When encountering an error, an exception will be thrown, so the minefield class should not be accessed directly, only via e.g. the controller (or display) classes.
+ *
+ * To keep calculation times low, a bunch of caching variables are used.
+ * Therefore, the private attributes should only be directly accessed after careful code review.
+ * This is unfourtunately necessary as otherwise constant iterations over the entire minefield are required.
+ */
 class Minefield {
     private:
         std::vector<std::vector<bool>> mines;

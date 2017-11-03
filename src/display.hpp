@@ -7,6 +7,11 @@
 #include <string>
 #include <vector>
 
+/**
+ * The Display class renders the minefield to the user.
+ * Basically everthing is delegated to the Controller class.
+ * The rendering itself is made possible by ncurses.
+ */
 class Display {
     private:
         Controller controller;

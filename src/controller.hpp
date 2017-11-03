@@ -3,6 +3,11 @@
 
 #include "minefield.hpp"
 
+/**
+ * The controller class servers as a driver for the minefield class.
+ * The main functionality is delegated to the minefield class, the controller mainly implements the cursor object.
+ * Another important feature is that the controller class *never* throws, opposed to the minefield class (which is relatively trigger happy with Exceptions).
+ */
 class Controller {
     private:
         Minefield mfield;
