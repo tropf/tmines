@@ -8,6 +8,7 @@
 #include <curses.h>
 #include <iostream>
 #include <random>
+#include <cstdlib>
 
 struct {
     int width = 8;
@@ -68,24 +69,14 @@ static int parse_opt(int key, char* arg, struct argp_state* state) {
 void run() {
     // seed not initialized? get one from hardware
     if (-1 == opts.seed) {
-        opts.seed = std::random_device()();
+        opts.seed = std::abs((int) std::random_device()());
     }
 
     if (-1 == opts.mine_count) {
         opts.mine_count = opts.height * opts.width * 0.16;
     }
     
-    try {
-        Display(opts.width, opts.height, opts.mine_count, opts.seed, opts.autodiscover_only);
-    } catch (std::exception& e) {
-        endwin();
-        std::cout << "Unfortunately, an error occured:" << std::endl;
-        std::cout << e.what() << std::endl;
-        std::cout << "Settings:" << std::endl;
-        std::cout << "Width, Height: " << opts.width << ", " << opts.height << std::endl;
-        std::cout << "Mine Count:    " << opts.mine_count << std::endl;
-        std::cout << "Seed:          " << opts.seed << std::endl;
-    }
+    Display(opts.width, opts.height, opts.mine_count, opts.seed, opts.autodiscover_only);
 }
 
 int main(int argc, char** argv) {
@@ -104,7 +95,22 @@ int main(int argc, char** argv) {
 
     int argp_state = argp_parse(&argp, argc, argv, 0, 0, 0);
 
-    run();
+    try{
+        run();
+    } catch (std::exception& e) {
+        endwin();
+        std::cerr << "Unfortunately, an error occured:" << std::endl;
+        std::cerr << e.what() << std::endl << std::endl;
+        std::cerr << "Settings:" << std::endl;
+        std::cerr << "  Width, Height: " << opts.width << ", " << opts.height << std::endl;
+        std::cerr << "  Mine Count:    " << opts.mine_count << std::endl;
+        std::cerr << "  Seed:          " << opts.seed << std::endl;
+        std::cerr << "  Args:";
+        for (int i = 1; i < argc; i++) {
+            std::cerr << " " << argv[i];
+        }
+        std::cerr << std::endl;
+    }
 
     return argp_state;
 }

@@ -6,6 +6,8 @@
 #include <curses.h>
 #include <string>
 #include <algorithm>
+#include <exception>
+#include <iostream>
 
 #include <chrono>
 
@@ -155,18 +157,25 @@ int Display::getKey() {
 
 void Display::handleKey(int key) {
     if (113 == key) {
+        pressed_keys.push_back('q');
         exit = true;
     } else if (' ' == key || KEY_ENTER == key) {
+        pressed_keys.push_back(' ');
         controller.click();
     } else if ('w' == key || KEY_UP == key || 'W' == key || 'k' == key || 'K' == key) {
+        pressed_keys.push_back('k');
         controller.moveUp();
     } else if ('a' == key || KEY_LEFT == key || 'A' == key || 'h' == key || 'H' == key) {
+        pressed_keys.push_back('h');
         controller.moveLeft();
     } else if ('s' == key || KEY_DOWN == key || 'S' == key || 'j' == key || 'J' == key) {
+        pressed_keys.push_back('j');
         controller.moveDown();
     } else if ('d' == key || KEY_RIGHT == key || 'D' == key || 'l' == key || 'L' == key) {
+        pressed_keys.push_back('l');
         controller.moveRight();
     } else if ('f' == key || 'F' == key) {
+        pressed_keys.push_back('f');
         controller.tooggleFlag();
     } else if (KEY_RESIZE == key) {
         checkWindowSize();
@@ -281,7 +290,18 @@ Display::Display(int width, int height, int mine_count, int seed, bool autodisco
     keypad(stdscr, TRUE);
     cbreak();
 
-    run();
+    try {
+        run();
+    } catch (std::runtime_error& e) {
+        std::string msg = e.what();
+        std::string keys_msg = "";
+        keys_msg = "Keypresses for error: ";
+        for (auto key : pressed_keys) {
+            keys_msg += std::to_string((int) key) + ", ";
+        }
+
+        throw std::runtime_error(msg + "\n\n" + keys_msg);
+    }
 
     endwin();
 }

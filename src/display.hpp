@@ -6,6 +6,7 @@
 #include <tuple>
 #include <string>
 #include <vector>
+#include <exception>
 
 /**
  * The Display class renders the minefield to the user.
@@ -17,6 +18,7 @@ class Display {
         Controller controller;
         bool exit;
         std::vector<std::vector<std::tuple<int, char>>> state, last_state;
+        std::vector<char> pressed_keys;
 
         const struct {
             std::string won = "won";
@@ -83,6 +85,13 @@ class Display {
          * Throws if the check fails.
          */
         void checkWindowSize();
+
+        /**
+         * Takes a thrown exception and appends information to the message to reproduce the error.
+         * @param e a thrown error where additional information should be added
+         * @throws std::runtime_error The given error message with additional information.
+         */
+        void addCrashInfo(std::exception given_exception);
 
     public:
         /**
