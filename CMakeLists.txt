@@ -34,7 +34,7 @@ if(GIT_FOUND)
         set(GIT_COMMIT_HASH "didn't build from git repo")
     endif()
 else()
-    set(GIT_COMMIT_HASH "no git found during build")
+    set(GIT_COMMIT_HASH "no git executable found during build")
 endif()
 
 message(STATUS "Building git commit '${GIT_COMMIT_HASH}'")
