@@ -1,2 +1,3 @@
 #define TerminalMines_VERSION_MAJOR @TerminalMines_VERSION_MAJOR@
 #define TerminalMines_VERSION_MINOR @TerminalMines_VERSION_MINOR@
+#define TerminalMines_GIT_COMMIT_HASH "@GIT_COMMIT_HASH@"

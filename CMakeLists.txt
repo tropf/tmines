@@ -22,12 +22,30 @@ if (debug)
     SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -g")
 endif()
 
+find_package(Git)
+if(GIT_FOUND)
+    execute_process(COMMAND ${GIT_EXECUTABLE} "rev-parse" "HEAD"
+                    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+                    OUTPUT_VARIABLE GIT_COMMIT_HASH
+                    RESULT_VARIABLE GIT_COMMIT_HASH_RETURN_VAR
+                    OUTPUT_STRIP_TRAILING_WHITESPACE
+                    ERROR_QUIET)
+    if (NOT "0" EQUAL "${GIT_COMMIT_HASH_RETURN_VAR}")
+        set(GIT_COMMIT_HASH "didn't build from git repo")
+    endif()
+else()
+    set(GIT_COMMIT_HASH "no git found during build")
+endif()
+
+message(STATUS "Building git commit '${GIT_COMMIT_HASH}'")
+
 configure_file(
     "${PROJECT_SOURCE_DIR}/src/config.h.in"
     "${PROJECT_BINARY_DIR}/src/config.h"
     )
 
 include_directories("${PROJECT_BINARY_DIR}")
+include_directories("${PROJECT_BINARY_DIR}/src")
 include_directories("${PROJECT_SOURCE_DIR}/src")
 
 add_library(minefield src/minefield.cpp)
