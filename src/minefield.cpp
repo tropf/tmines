@@ -29,6 +29,7 @@ Minefield::Minefield(int dimension_x, int dimension_y, int mine_count, int seed)
 
     // init caching vars
     open_cnt = 0;
+    flag_cnt = 0;
     opened_mine = false;
     
     // init matrixes
@@ -198,7 +199,11 @@ void Minefield::flag(int x, int y) {
     if (isOpen(x, y)) {
         throw std::runtime_error("Can't place flag on opened field.");
     }
-    flags[x][y] = true;
+
+    if (! isFlagged(x, y)) {
+        flags[x][y] = true;
+        flag_cnt++;
+    }
 }
 
 void Minefield::unflag(int x, int y) {
@@ -209,7 +214,10 @@ void Minefield::unflag(int x, int y) {
         throw std::runtime_error("Can't remove flag on opened field.");
     }
 
-    flags[x][y] = false;
+    if (isFlagged(x, y)) {
+        flags[x][y] = false;
+        flag_cnt--;
+    }
 }
 
 void Minefield::open(int x, int y, bool recursive) {
@@ -338,25 +346,12 @@ int Minefield::getYDimension() {
     return given_y_dimension;
 }
 
-int getTrueCount(std::vector<std::vector<bool>> matrix) {
-    int sum = 0;
-    for (unsigned long x = 0; x < matrix.size(); x++) {
-        for (unsigned long y = 0; y < matrix[x].size(); y++) {
-            if (matrix[x][y]) {
-                sum++;
-            }
-        }
-    }
-
-    return sum;
-}
-
 int Minefield::getMineCount() {
     return given_mine_count;
 }
 
 int Minefield::getFlagCount() {
-    return getTrueCount(flags);
+    return flag_cnt;
 }
 
 int Minefield::getOpenCount() {

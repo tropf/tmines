@@ -21,6 +21,7 @@ class Minefield {
         int given_x_dimension;
         int given_y_dimension;
         int open_cnt;
+        int flag_cnt;
         bool opened_mine;
         
         /**
