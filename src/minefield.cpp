@@ -1,3 +1,7 @@
+/// Minefield method bodies
+/** \file
+ * Contains the method bodies for the minefield class
+ */
 #include "minefield.hpp"
 
 #include <vector>

@@ -1,8 +1,13 @@
+/// minefield class definition
+/** \file
+ * Contains the class definition for the minefield class.
+ */
 #ifndef __MINEFIELD_HPP_INCLUDED__
 #define __MINEFIELD_HPP_INCLUDED__
 
 #include <vector>
 
+/// Implements the internal game logic
 /**
  * The minefield class impplements the basic functionality of minesweeper.
  * When encountering an error, an exception will be thrown, so the minefield class should not be accessed directly, only via e.g. the controller (or display) classes.
@@ -13,15 +18,71 @@
  */
 class Minefield {
     private:
+        /// mine positions
+        /**
+         * Used to save the position of the mines, intialized in the constructor.
+         * Access from outside via isMine() method.
+         * Access internally directly.
+         */
         std::vector<std::vector<bool>> mines;
+
+        /// flag positions
+        /**
+         * Used to save the position of the flags, intialized in the constructor.
+         * Access via the flag()/unflag() methods.
+         */
         std::vector<std::vector<bool>> flags;
+
+        /// opened fields
+        /**
+         * Saves the positions of the opened fields. Access via the open() method.
+         */
         std::vector<std::vector<bool>> opened;
+
+        /// seed used for generation
+        /**
+         * Stores the seed used for generation of the mine placement.
+         * Kept to potentially return later.
+         */
         int given_seed;
+
+        /// caching var for mine count
+        /**
+         * Holds the amount of placed mines. Remains constant after initialisation through the constructor.
+         */
         int given_mine_count;
+
+        /// caching var for x dimension
+        /**
+         * Holds the width of the game board, so the arrays don't have to be accessed to check for dimensions.
+         */
         int given_x_dimension;
+
+        /// caching var for y dimension
+        /**
+         * Holds the height of the game board, so the arrays don't have to be accessed to check for dimensions.
+         */
         int given_y_dimension;
+
+        /// caching var for amount of opened fields
+        /**
+         * Caching var to count the opened fields.
+         * Set inside of the open() method
+         */
         int open_cnt;
+
+        /// caching var for amount of placed flags
+        /**
+         * Holds the amount of placed flags.
+         * Is updated in the flag()/unflag() methods.
+         */
         int flag_cnt;
+
+        /// caching var, true if a mine has been opened.
+        /**
+         * A caching var to save if a mine has been opened.
+         * Greatly decreased time for checks if the game is still running.
+         */
         bool opened_mine;
         
         /**
