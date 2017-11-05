@@ -1,9 +1,9 @@
 cmake_minimum_required (VERSION 2.6)
 
-project (TerminalMines)
+project (TerminateMines)
 
-set (TerminalMines_VERSION_MAJOR 0)
-set (TerminalMines_VERSION_MINOR 9)
+set (TerminateMines_VERSION_MAJOR 0)
+set (TerminateMines_VERSION_MINOR 9)
 set(CMAKE_CXX_STANDARD 14)
 
 option(build_tests "build tests alongside the project" OFF)
@@ -55,7 +55,7 @@ add_library(display src/display.cpp)
 find_package(Curses REQUIRED)
 include_directories(${CURSES_INCLUDE_DIRS})
 
-add_executable(tmines src/mines.cpp)
+add_executable(tmines src/tmines.cpp)
 
 add_subdirectory(doc)
 

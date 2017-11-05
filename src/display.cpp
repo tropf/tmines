@@ -156,7 +156,7 @@ int Display::getKey() {
 }
 
 void Display::handleKey(int key) {
-    if (113 == key) {
+    if ('q' == key || 'Q' == key) {
         pressed_keys.push_back('q');
         exit = true;
     } else if (' ' == key || KEY_ENTER == key) {
