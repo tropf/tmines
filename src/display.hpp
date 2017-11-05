@@ -86,13 +86,6 @@ class Display {
          */
         void checkWindowSize();
 
-        /**
-         * Takes a thrown exception and appends information to the message to reproduce the error.
-         * @param e a thrown error where additional information should be added
-         * @throws std::runtime_error The given error message with additional information.
-         */
-        void addCrashInfo(std::exception given_exception);
-
     public:
         /**
          * Constructor. Automatically takes over the window. (Is blocking)
