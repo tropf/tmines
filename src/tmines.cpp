@@ -113,10 +113,16 @@ int main(int argc, char** argv) {
         err_report += "Message:\n";
         err_report += "  " + std::string(e.what()) + "\n\n";
         err_report += "Settings:\n";
-        err_report += "  Width, Height: " + std::to_string(opts.width) + ", " + std::to_string(opts.height) + "\n";
-        err_report += "  Mine Count:    " + std::to_string(opts.mine_count) + "\n";
-        err_report += "  Seed:          " + std::to_string(opts.seed) + "\n";
-        err_report += "  Args:         ";
+        err_report += "  Width, Height:     " + std::to_string(opts.width) + ", " + std::to_string(opts.height) + "\n";
+        err_report += "  Mine Count:        " + std::to_string(opts.mine_count) + "\n";
+        err_report += "  Seed:              " + std::to_string(opts.seed) + "\n";
+        err_report += "  Autodiscover only: ";
+        if (opts.autodiscover_only) {
+            err_report += "enabled\n";
+        } else {
+            err_report += "disabled\n";
+        }
+        err_report += "  Args:             ";
         for (int i = 1; i < argc; i++) {
             err_report += " " + std::string(argv[i]);
         }
@@ -131,7 +137,7 @@ int main(int argc, char** argv) {
             std::ofstream report_file;
             report_file.open(CRASH_REPORT_FILE);
 
-            if (! report_file.is_open()) {
+            if (! report_file.good()) {
                 throw std::runtime_error("Can't open file \"" + std::string(CRASH_REPORT_FILE) + "\"");
             }
             report_file << err_report;
