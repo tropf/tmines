@@ -23,6 +23,7 @@ class Minefield {
          * Used to save the position of the mines, intialized in the constructor.
          * Access from outside via isMine() method.
          * Access internally directly.
+         * @see isMine()
          */
         std::vector<std::vector<bool>> mines;
 
@@ -30,12 +31,15 @@ class Minefield {
         /**
          * Used to save the position of the flags, intialized in the constructor.
          * Access via the flag()/unflag() methods.
+         * @see flag()
+         * @see unflag()
          */
         std::vector<std::vector<bool>> flags;
 
         /// opened fields
         /**
          * Saves the positions of the opened fields. Access via the open() method.
+         * @see open()
          */
         std::vector<std::vector<bool>> opened;
 
@@ -43,24 +47,28 @@ class Minefield {
         /**
          * Stores the seed used for generation of the mine placement.
          * Kept to potentially return later.
+         * @see getSeed()
          */
         int given_seed;
 
         /// caching var for mine count
         /**
          * Holds the amount of placed mines. Remains constant after initialisation through the constructor.
+         * @see getMineCount()
          */
         int given_mine_count;
 
         /// caching var for x dimension
         /**
          * Holds the width of the game board, so the arrays don't have to be accessed to check for dimensions.
+         * @see getXDimension()
          */
         int given_x_dimension;
 
         /// caching var for y dimension
         /**
          * Holds the height of the game board, so the arrays don't have to be accessed to check for dimensions.
+         * @see getYDimension()
          */
         int given_y_dimension;
 
@@ -68,6 +76,8 @@ class Minefield {
         /**
          * Caching var to count the opened fields.
          * Set inside of the open() method
+         * @see getOpenCount()
+         * @see open()
          */
         int open_cnt;
 
@@ -75,6 +85,9 @@ class Minefield {
         /**
          * Holds the amount of placed flags.
          * Is updated in the flag()/unflag() methods.
+         * @see getFlagCount()
+         * @see flag()
+         * @see unflag()
          */
         int flag_cnt;
 
@@ -82,6 +95,7 @@ class Minefield {
         /**
          * A caching var to save if a mine has been opened.
          * Greatly decreased time for checks if the game is still running.
+         * @see isGameRunning()
          */
         bool opened_mine;
         
@@ -117,6 +131,7 @@ class Minefield {
          * @return true if no more turns can be taken
          */
         bool isGameEnded();
+
         /**
          * Returns true if the game is still running and more moves can be made.
          * @return true if more turns can be taken
@@ -128,6 +143,7 @@ class Minefield {
          * @return true if game is over & won
          */
         bool isGameWon();
+
         /**
          * Returns true if the game is over and has been lost.
          * (By clicking on a mine e.g.)
@@ -167,7 +183,7 @@ class Minefield {
         /**
          * Returns true if the given position is a mine (and has been opened).
          * Throws on invalid coordinates.
-         * Throws on not-opened spot.
+         * Throws on not-opened spot while game is running.
          * Can be used on any spot w/o error after game end.
          * @param x x coordinate
          * @param y y coordinate
@@ -246,6 +262,7 @@ class Minefield {
 
         /**
          * Returns the amount of placed flags.
+         * Note: There can be more flags than mines
          * @return amount of placed flags
          */
         int getFlagCount();
