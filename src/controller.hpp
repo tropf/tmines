@@ -1,3 +1,7 @@
+/// controller class definition
+/** \file
+ * Contains the class definition for the controller class.
+ */
 #ifndef __CONTROLLER_H_INCLUDED__
 #define __CONTROLLER_H_INCLUDED__
 
@@ -10,8 +14,33 @@
  */
 class Controller {
     private:
+        /// controlled minefield
+        /**
+         * The controlled minefield.
+         * Can be directly retrieved to query it directly, though no manipulations should be performed directly.
+         * @see getMinefield()
+         */
         Minefield mfield;
-        int x, y;
+
+        /// current cursor position (x)
+        /**
+         * Holds the current cursor coordinates.
+         * Always a valid position on the minefield.
+         */
+        int x;
+
+        /// current cursor position (y)
+        /**
+         * Holds the current cursor coordinates.
+         * Always a valid position on the minefield.
+         */
+        int y;
+
+        /// never open fields directly
+        /**
+         * When set, fields can only be opened via the autodiscover feature.
+         * The first field is an Exception, it can be opened directly.
+         */
         bool autodiscover_only;
     public:
         /**

@@ -1,3 +1,7 @@
+/// controller method bodies
+/** \file
+ * Contains the method bodies for the controller class.
+ */
 #include "controller.hpp"
 
 #include <tuple>
