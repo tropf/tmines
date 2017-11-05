@@ -1,3 +1,6 @@
-#define TerminateMines_VERSION_MAJOR @TerminateMines_VERSION_MAJOR@
-#define TerminateMines_VERSION_MINOR @TerminateMines_VERSION_MINOR@
+#define TerminateMines_VERSION_MAJOR "@TerminateMines_VERSION_MAJOR@"
+#define TerminateMines_VERSION_MINOR "@TerminateMines_VERSION_MINOR@"
 #define TerminateMines_GIT_COMMIT_HASH "@GIT_COMMIT_HASH@"
+#define TerminateMines_BUG_ADDRESS "@TerminateMines_BUG_ADDRESS@"
+
+#define CRASH_REPORT_FILE "tmines.crash"

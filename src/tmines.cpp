@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "display.hpp"
+#include "config.h"
 
 #include <string>
 #include <argp.h>
@@ -9,6 +10,10 @@
 #include <iostream>
 #include <random>
 #include <cstdlib>
+#include <fstream>
+
+const char* argp_program_bug_address = TerminateMines_BUG_ADDRESS;
+const char* argp_program_version = "version " TerminateMines_VERSION_MAJOR "." TerminateMines_VERSION_MINOR " (commit " TerminateMines_GIT_COMMIT_HASH ")";
 
 struct {
     int width = 8;
@@ -99,17 +104,50 @@ int main(int argc, char** argv) {
         run();
     } catch (std::exception& e) {
         endwin();
-        std::cerr << "Unfortunately, an error occured:" << std::endl;
-        std::cerr << e.what() << std::endl << std::endl;
-        std::cerr << "Settings:" << std::endl;
-        std::cerr << "  Width, Height: " << opts.width << ", " << opts.height << std::endl;
-        std::cerr << "  Mine Count:    " << opts.mine_count << std::endl;
-        std::cerr << "  Seed:          " << opts.seed << std::endl;
-        std::cerr << "  Args:";
+        std::string err_report = "";
+        err_report += "Error Report\n\n";
+        err_report += "=====================================\n";
+        err_report += "Please send this to \"" + std::string(TerminateMines_BUG_ADDRESS) + "\"\n";
+        err_report += "Thank you!\n";
+        err_report += "=====================================\n\n";
+        err_report += "Message:\n";
+        err_report += "  " + std::string(e.what()) + "\n\n";
+        err_report += "Settings:\n";
+        err_report += "  Width, Height: " + std::to_string(opts.width) + ", " + std::to_string(opts.height) + "\n";
+        err_report += "  Mine Count:    " + std::to_string(opts.mine_count) + "\n";
+        err_report += "  Seed:          " + std::to_string(opts.seed) + "\n";
+        err_report += "  Args:         ";
         for (int i = 1; i < argc; i++) {
-            std::cerr << " " << argv[i];
+            err_report += " " + std::string(argv[i]);
         }
-        std::cerr << std::endl;
+        err_report += "\n\n";
+
+        err_report += "Version\n";
+        err_report += "  Version Number: " + std::string(TerminateMines_VERSION_MAJOR) + "." + std::string(TerminateMines_VERSION_MINOR) + "\n";
+        err_report += "  Git Commit:     " + std::string(TerminateMines_GIT_COMMIT_HASH) + "\n";
+
+        std::cerr << "Unfourtunately an Error occured!" << std::endl;
+        try{
+            std::ofstream report_file;
+            report_file.open(CRASH_REPORT_FILE);
+
+            if (! report_file.is_open()) {
+                throw std::runtime_error("Can't open file \"" + std::string(CRASH_REPORT_FILE) + "\"");
+            }
+            report_file << err_report;
+            
+            std::cerr << "A crash report has been written to the file \"" << CRASH_REPORT_FILE <<"\"" << std::endl;
+            std::cerr << "To help to fix that error please send an email to \"" << TerminateMines_BUG_ADDRESS << "\" and attach the file \"" << CRASH_REPORT_FILE << "\"." << std::endl;
+            std::cerr << "Thank you!" << std::endl;
+        } catch (std::exception& inner_error) {
+            std::cerr << "The error report could not be written to a file due to:" << std::endl;
+            std::cerr << "  " << inner_error.what() << std::endl << std::endl;
+            std::cerr << "========================" << std::endl;
+            std::cerr << err_report << std::endl;
+            std::cerr << "========================" << std::endl;
+            std::cerr << "Please send this crash report to \"" << TerminateMines_BUG_ADDRESS << "\"." << std::endl;
+            std::cerr << "Thank you!" << std::endl;
+        }
     }
 
     return argp_state;

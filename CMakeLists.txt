@@ -5,6 +5,7 @@ project (TerminateMines)
 set (TerminateMines_VERSION_MAJOR 0)
 set (TerminateMines_VERSION_MINOR 9)
 set(CMAKE_CXX_STANDARD 14)
+set(TerminateMines_BUG_ADDRESS "tropf@posteo.de")
 
 option(build_tests "build tests alongside the project" OFF)
 option(debug "build with gdb debugging symbols" OFF)
@@ -36,8 +37,6 @@ if(GIT_FOUND)
 else()
     set(GIT_COMMIT_HASH "no git executable found during build")
 endif()
-
-message(STATUS "Building git commit '${GIT_COMMIT_HASH}'")
 
 configure_file(
     "${PROJECT_SOURCE_DIR}/src/config.h.in"
