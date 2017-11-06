@@ -241,8 +241,6 @@ void Display::run() {
 
     bkgd(COLOR_PAIR(10));
 
-    checkWindowSize();
-
     unsigned long calc_time = 0;
     unsigned long draw_time = 0;
     unsigned long handle_time = 0;
@@ -271,6 +269,7 @@ void Display::run() {
 
 Display::Display(int width, int height, int mine_count, int seed, bool autodiscover_only) {
     controller = Controller(width, height, mine_count, seed, autodiscover_only);
+    controller.putCursor((width - 1) / 2, (height - 1) / 2); // zero indexed, so subtract one before dividing
     exit = false;
 
     // init state vars
@@ -289,6 +288,8 @@ Display::Display(int width, int height, int mine_count, int seed, bool autodisco
     start_color();
     keypad(stdscr, TRUE);
     cbreak();
+
+    checkWindowSize();
 
     try {
         run();

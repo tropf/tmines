@@ -103,7 +103,6 @@ int main(int argc, char** argv) {
     try{
         run();
     } catch (std::exception& e) {
-        endwin();
         std::string err_report = "";
         err_report += "Error Report\n\n";
         err_report += "=====================================\n";
@@ -128,11 +127,22 @@ int main(int argc, char** argv) {
         }
         err_report += "\n\n";
 
+        err_report += "Terminal:\n";
+        err_report += "  Lines: " + std::to_string(LINES) + "\n";
+        err_report += "  Cols:  " + std::to_string(COLS) + "\n";
+
+        err_report += "\n";
+
         err_report += "Version\n";
         err_report += "  Version Number: " + std::string(TerminateMines_VERSION_MAJOR) + "." + std::string(TerminateMines_VERSION_MINOR) + "\n";
         err_report += "  Git Commit:     " + std::string(TerminateMines_GIT_COMMIT_HASH) + "\n";
 
-        std::cerr << "Unfourtunately an Error occured!" << std::endl;
+        // end window here, as COLS ans ROWS are read during creation of error report
+        endwin();
+
+        std::cerr << "Unfourtunately an Error occured:" << std::endl;
+        std::cerr << "  " << e.what() << std::endl << std::endl;
+
         try{
             std::ofstream report_file;
             report_file.open(CRASH_REPORT_FILE);
@@ -143,7 +153,7 @@ int main(int argc, char** argv) {
             report_file << err_report;
             
             std::cerr << "A crash report has been written to the file \"" << CRASH_REPORT_FILE <<"\"" << std::endl;
-            std::cerr << "To help to fix that error please send an email to \"" << TerminateMines_BUG_ADDRESS << "\" and attach the file \"" << CRASH_REPORT_FILE << "\"." << std::endl;
+            std::cerr << "If you think that error should not be popping up, please send an email to \"" << TerminateMines_BUG_ADDRESS << "\" and attach the file \"" << CRASH_REPORT_FILE << "\"." << std::endl;
             std::cerr << "Thank you!" << std::endl;
         } catch (std::exception& inner_error) {
             std::cerr << "The error report could not be written to a file due to:" << std::endl;
