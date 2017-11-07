@@ -11,6 +11,7 @@
 #include <random>
 #include <cstdlib>
 #include <fstream>
+#include <sstream>
 
 const char* argp_program_bug_address = TerminateMines_BUG_ADDRESS;
 const char* argp_program_version = "version " TerminateMines_VERSION_MAJOR "." TerminateMines_VERSION_MINOR " (commit " TerminateMines_GIT_COMMIT_HASH ")";
@@ -141,7 +142,11 @@ int main(int argc, char** argv) {
         endwin();
 
         std::cerr << "Unfourtunately an Error occured:" << std::endl;
-        std::cerr << "  " << e.what() << std::endl << std::endl;
+        // only print first line:
+        std::istringstream err_msg_stream(e.what());
+        std::string firstline;
+        std::getline(err_msg_stream, firstline);
+        std::cerr << "  " << firstline << std::endl << std::endl;
 
         try{
             std::ofstream report_file;
