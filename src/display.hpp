@@ -86,6 +86,20 @@ class Display {
          */
         void checkWindowSize();
 
+        /**
+         * Redraws the entire window on call
+         */
+        void redrawWindow();
+
+        /**
+         * Starts the window.
+         * Setting up colors, cursor mode...
+         * Calls initscr() of curses lib
+         *
+         * Note: Window can be ended by just calling endwin(), also from curses lib
+         */
+        void startWindow();
+
     public:
         /**
          * Constructor. Automatically takes over the window. (Is blocking)

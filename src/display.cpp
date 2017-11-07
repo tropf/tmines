@@ -177,6 +177,9 @@ void Display::handleKey(int key) {
     } else if ('f' == key || 'F' == key) {
         pressed_keys.push_back('f');
         controller.tooggleFlag();
+    } else if ('r' == key || 'R' == key) {
+        pressed_keys.push_back('r');
+        redrawWindow();
     } else if (KEY_RESIZE == key) {
         checkWindowSize();
     }
@@ -224,7 +227,35 @@ void Display::checkWindowSize() {
     }
 }
 
-void Display::run() {
+void Display::redrawWindow() {
+    for (int x = 0; x < controller.getWidth(); x++) {
+        for (int y = 0; y < controller.getHeight(); y++) {
+            // set to invalid color & invalid char
+            // => redrawn on window update
+            last_state[x][y] = std::make_tuple(-1, ';');
+        }
+    }
+
+    clear();
+    refresh();
+
+    endwin();
+    startWindow();
+
+    renderBoard();
+    renderStatusline();
+    updateCursor();
+}
+
+void Display::startWindow() {
+    initscr();
+    noecho();
+    start_color();
+    keypad(stdscr, TRUE);
+    cbreak();
+
+    checkWindowSize();
+
     init_pair(0, COLOR_WHITE, COLOR_BLACK);
     init_pair(1, COLOR_BLUE, COLOR_BLACK);
     init_pair(2, COLOR_GREEN, COLOR_BLACK);
@@ -240,7 +271,9 @@ void Display::run() {
     init_pair(13, COLOR_GREEN, COLOR_BLACK);
 
     bkgd(COLOR_PAIR(10));
+}
 
+void Display::run() {
     unsigned long calc_time = 0;
     unsigned long draw_time = 0;
     unsigned long handle_time = 0;
@@ -263,8 +296,6 @@ void Display::run() {
         draw_time += std::chrono::duration_cast<std::chrono::nanoseconds>(time_after_render - time_before_render).count();
         handle_time += std::chrono::duration_cast<std::chrono::nanoseconds>(time_after_handle - time_before_handle).count();
     }
-
-    throw std::runtime_error("Calc Time:\t" + std::to_string(calc_time) + " ns\nRender Time:\t" + std::to_string(draw_time) + " ns\nHandle Time:\t" + std::to_string(handle_time) + " ns");
 }
 
 Display::Display(int width, int height, int mine_count, int seed, bool autodiscover_only) {
@@ -283,16 +314,12 @@ Display::Display(int width, int height, int mine_count, int seed, bool autodisco
     
     last_state = state;
 
-    initscr();
-    noecho();
-    start_color();
-    keypad(stdscr, TRUE);
-    cbreak();
-
-    checkWindowSize();
-
     try {
+        startWindow();
         run();
+        // clear window, so not the entire screen is filled w/ the field after quitting
+        clear();
+        refresh();
     } catch (std::runtime_error& e) {
         std::string msg = e.what();
         std::string keys_msg = "";
