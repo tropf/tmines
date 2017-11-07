@@ -87,14 +87,14 @@ void run() {
 
 int main(int argc, char** argv) {
     struct argp_option options[] = {
-        {"width", 'w', "NUM", 0, "width of the minefield, default: 8", 0},
+        {"width", 'w', "WIDTH", 0, "width of the minefield, default: 8", 0},
         {0, 'x', 0, OPTION_ALIAS, 0, 0},
-        {"height", 'h', "NUM", 0, "height of the minefield, default: 8", 0},
+        {"height", 'h', "HEIGHT", 0, "height of the minefield, default: 8", 0},
         {0, 'y', 0, OPTION_ALIAS, 0, 0},
         {"mine-count", 'c', "NUM", 0, "number of mines to be placed, default: 16%", 0},
         {"count", 0, 0, OPTION_ALIAS, 0, 0},
         {"autodiscover-only", 'a', 0, 0, "if enabled: fields can only be opened using autodiscover feature (see man)", 0},
-        {"seed", 's', "NUM", 0, "seed for field generation, suitable seed will be chosen by automatically", 0},
+        {"seed", 's', "SEED", 0, "seed for field generation, suitable seed will be chosen by automatically", 0},
         {0, 0, 0, 0, 0, 0}
     };
     struct argp argp = {options, parse_opt, 0, "Play Minesweeper on the terminal.\vControls:\nMovement    WASD, Arrow Keys, vimlike\nFlag Mine   F\nOpen Field  Space\nQuit        Q", 0, 0, 0};
