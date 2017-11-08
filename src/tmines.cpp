@@ -22,6 +22,7 @@ struct {
     int mine_count = -1;
     int seed = -1;
     bool autodiscover_only = false;
+    bool fullscreen = false;
 } opts;
 
 bool has_only_digits(const std::string s){
@@ -64,6 +65,10 @@ static int parse_opt(int key, char* arg, struct argp_state* state) {
             }
             break;
 
+        case 'f':
+            opts.fullscreen = true;
+            break;
+
         case 'a':
             opts.autodiscover_only = true;
             break;
@@ -72,16 +77,57 @@ static int parse_opt(int key, char* arg, struct argp_state* state) {
     return 0;
 }
 
+int get_minecount_for_size(int width = -1, int height = -1) {
+    if (-1 == width) {
+        width = opts.width;
+    }
+    if (-1 == height) {
+        height = opts.height;
+    }
+
+    if (-1 != opts.mine_count) {
+        return opts.mine_count;
+    } else {
+        return width * height * 0.16;
+    }
+}
+
 void run() {
     // seed not initialized? get one from hardware
     if (-1 == opts.seed) {
         opts.seed = std::abs((int) std::random_device()());
     }
 
-    if (-1 == opts.mine_count) {
-        opts.mine_count = opts.height * opts.width * 0.16;
+    if (opts.fullscreen) {
+        // initalize LINES and COLS vars
+        initscr();
+        endwin();
+        opts.height = 0;
+        opts.width = 0;
+
+        int required_width = 0, required_height = 0;
+        int mine_count = 0;
+
+        // maximum possible X coordinate: 41
+        // so after the loop opts.width will be 42
+        // so there will be 42 indexes, 0..41
+        while (required_width < COLS) {
+            opts.width++;
+            // recalculate dimensions
+            std::tie(required_width, required_height) = Display::getRequiredWindowSize(opts.width, opts.height, get_minecount_for_size());
+        }
+
+        while (required_height < LINES) {
+            opts.height++;
+            // recalculate dimensions
+            std::tie(required_width, required_height) = Display::getRequiredWindowSize(opts.width, opts.height, get_minecount_for_size());
+        }
     }
-    
+
+    if (-1 == opts.mine_count) {
+        opts.mine_count = get_minecount_for_size(opts.width, opts.height);
+    }
+
     Display(opts.width, opts.height, opts.mine_count, opts.seed, opts.autodiscover_only);
 }
 
@@ -93,6 +139,7 @@ int main(int argc, char** argv) {
         {0, 'y', 0, OPTION_ALIAS, 0, 0},
         {"mine-count", 'c', "NUM", 0, "number of mines to be placed, default: 16%", 0},
         {"count", 0, 0, OPTION_ALIAS, 0, 0},
+        {"fullscreen", 'f', 0, 0, "will use maximum size if set; overrides --width and --height", 0},
         {"autodiscover-only", 'a', 0, 0, "if enabled: fields can only be opened using autodiscover feature (see man)", 0},
         {"seed", 's', "SEED", 0, "seed for field generation, suitable seed will be chosen by automatically", 0},
         {0, 0, 0, 0, 0, 0}
@@ -170,6 +217,8 @@ int main(int argc, char** argv) {
             std::cerr << "Thank you!" << std::endl;
         }
     }
+
+    auto pos = Display::getConsolePosition(1, 1);
 
     return argp_state;
 }

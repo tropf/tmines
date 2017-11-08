@@ -11,6 +11,9 @@
 
 #include <chrono>
 
+// mention here for linker
+const struct msgs_struct Display::msgs;
+
 void Display::renderBoard() {
     auto mfield = controller.getMinefield();
     for (int x = 0; x < mfield.getXDimension(); x++) {
@@ -87,7 +90,7 @@ bool replace(std::string& str, const std::string& from, const std::string& to) {
     return true;
 }
 
-int Display::getMaxTextWidth() {
+int Display::getMaxTextWidth(int mine_count) {
     std::vector<int> all_lengths = {0};
     
     all_lengths.push_back(msgs.won.length());
@@ -95,7 +98,7 @@ int Display::getMaxTextWidth() {
     all_lengths.push_back(msgs.running.length());
 
     auto max_remaining_mines = msgs.remaining_mines;
-    replace(max_remaining_mines, "%mine_count%", std::to_string(controller.getMinefield().getMineCount()));
+    replace(max_remaining_mines, "%mine_count%", std::to_string(mine_count));
 
     all_lengths.push_back(max_remaining_mines.length());
 
@@ -139,14 +142,14 @@ void Display::renderStatusline() {
     std::tie(x, y) = getConsolePosition(0, mfield.getYDimension() + 1);
 
     color_set(0, 0);
-    mvaddstr(y, x, std::string(getMaxTextWidth(), ' ').c_str());
+    mvaddstr(y, x, std::string(getMaxTextWidth(mfield.getMineCount()), ' ').c_str());
 
     color_set(color_to_use, 0);
     mvaddstr(y, x, game_state.c_str());
 
     std::tie(x, y) = getConsolePosition(0, mfield.getYDimension() + 2);
     color_set(0, 0);
-    mvaddstr(y, x, std::string(getMaxTextWidth(), ' ').c_str());
+    mvaddstr(y, x, std::string(getMaxTextWidth(mfield.getMineCount()), ' ').c_str());
     color_set(12, 0);
     mvaddstr(y, x, remaining_mines.c_str());
 }
@@ -197,17 +200,23 @@ void Display::updateCursor() {
     }
 }
 
-void Display::checkWindowSize() {
-    int field_width, field_height;
-    std::tie(field_width, field_height) = getConsolePosition(controller.getMinefield().getXDimension() - 1, controller.getMinefield().getYDimension() - 1);
+bool Display::isWindowSizeSufficient(int field_width, int field_height, int mine_count, int window_width, int window_height) {
+    int required_width, required_height;
+    std::tie(required_width, required_height) = getRequiredWindowSize(field_width, field_height, mine_count);
 
-    int max_text_width = getMaxTextWidth();
+    return (window_height >= required_height && window_width >= required_width);
+}
 
-    int text_height;
-    text_height = std::get<1>(getConsolePosition(controller.getMinefield().getXDimension() - 1, controller.getMinefield().getYDimension() + 2));
-
+std::tuple<int, int> Display::getRequiredWindowSize(int field_width, int field_height, int mine_count) {
     int required_width = field_width;
     int required_height = field_height;
+
+    std::tie(required_width, required_height) = getConsolePosition(field_width - 1, field_height - 1);
+
+    int max_text_width = getMaxTextWidth(mine_count);
+
+    int text_height;
+    text_height = std::get<1>(getConsolePosition(field_width - 1, field_height + 2));
 
     if (max_text_width > required_width) {
         required_width = max_text_width;
@@ -218,11 +227,22 @@ void Display::checkWindowSize() {
     }
 
     // the output until now are coordinates to write
-    // conver to amount of cols/rows
+    // convert to amount of cols/rows
     required_width++;
     required_height++;
 
-    if (LINES < required_height || COLS < required_width) {
+    return std::make_tuple(required_width, required_height);
+}
+
+void Display::checkWindowSize() {
+    int minefield_width = controller.getWidth();
+    int minefield_height = controller.getHeight();
+    int mine_count = controller.getMinefield().getMineCount();
+
+    if (!isWindowSizeSufficient(minefield_width, minefield_height, mine_count, COLS, LINES)) {
+        int required_width, required_height;
+        std::tie(required_width, required_height) = getRequiredWindowSize(minefield_width, minefield_height, mine_count);
+
         throw std::runtime_error(std::to_string(required_width) + "x" + std::to_string(required_height) + " terminal required to display this minefield (Current: " + std::to_string(COLS) + "x" + std::to_string(LINES) + ")");
     }
 }
