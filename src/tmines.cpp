@@ -17,10 +17,11 @@ const char* argp_program_bug_address = TerminateMines_BUG_ADDRESS;
 const char* argp_program_version = "version " TerminateMines_VERSION_MAJOR "." TerminateMines_VERSION_MINOR " (commit " TerminateMines_GIT_COMMIT_HASH ")";
 
 struct {
-    int width = 8;
-    int height = 8;
+    int width = -1;
+    int height = -1;
     int mine_count = -1;
     int seed = -1;
+    int mine_density = -1;
     bool autodiscover_only = false;
     bool fullscreen = false;
 } opts;
@@ -30,6 +31,15 @@ bool has_only_digits(const std::string s){
 }
 
 static int parse_opt(int key, char* arg, struct argp_state* state) {
+    // check for incompatibilities
+    if ((-1 != opts.height || -1 != opts.width) && opts.fullscreen) {
+        argp_error(state, "can't set window size (height & width) explicitly and use fullscreen option at the same time");
+    }
+
+    if (-1 != opts.mine_count && -1 != opts.mine_density) {
+        argp_error(state, "can't specify mine count explicitly and set mine density at the same time");
+    }
+
     switch (key) {
         case 'x':
         case 'w':
@@ -52,6 +62,17 @@ static int parse_opt(int key, char* arg, struct argp_state* state) {
         case 'c':
             if (has_only_digits(arg)) {
                 opts.mine_count = std::atoi(arg);
+            } else {
+                argp_failure(state, 1, 0, "Argument must be number");
+            }
+            break;
+
+        case 'd':
+            if (has_only_digits(arg)) {
+                opts.mine_density = std::atoi(arg);
+                if (0 > opts.mine_density || opts.mine_density > 100) {
+                    argp_failure(state, 1, 0, "mine density must be between 0 and 100 (percent)");
+                }
             } else {
                 argp_failure(state, 1, 0, "Argument must be number");
             }
@@ -85,10 +106,14 @@ int get_minecount_for_size(int width = -1, int height = -1) {
         height = opts.height;
     }
 
+    if (-1 == opts.mine_density) {
+        opts.mine_density = 16;
+    }
+
     if (-1 != opts.mine_count) {
         return opts.mine_count;
     } else {
-        return width * height * 0.16;
+        return (width * height * opts.mine_density) / 100;
     }
 }
 
@@ -96,6 +121,14 @@ void run() {
     // seed not initialized? get one from hardware
     if (-1 == opts.seed) {
         opts.seed = std::abs((int) std::random_device()());
+    }
+
+    if (-1 == opts.height) {
+        opts.height = 10;
+    }
+
+    if (-1 == opts.width) {
+        opts.width = 10;
     }
 
     if (opts.fullscreen) {
@@ -133,18 +166,27 @@ void run() {
 
 int main(int argc, char** argv) {
     struct argp_option options[] = {
-        {"width", 'w', "WIDTH", 0, "width of the minefield, default: 8", 0},
-        {0, 'x', 0, OPTION_ALIAS, 0, 0},
-        {"height", 'h', "HEIGHT", 0, "height of the minefield, default: 8", 0},
-        {0, 'y', 0, OPTION_ALIAS, 0, 0},
-        {"mine-count", 'c', "NUM", 0, "number of mines to be placed, default: 16%", 0},
-        {"count", 0, 0, OPTION_ALIAS, 0, 0},
-        {"fullscreen", 'f', 0, 0, "will use maximum size if set; overrides --width and --height", 0},
-        {"autodiscover-only", 'a', 0, 0, "if enabled: fields can only be opened using autodiscover feature (see man)", 0},
-        {"seed", 's', "SEED", 0, "seed for field generation, suitable seed will be chosen by automatically", 0},
+        {0, 0, 0, 0, "Field Size", 10},
+        {"width", 'w', "WIDTH", 0, "width of the minefield, default: 10", 10},
+        {0, 'x', 0, OPTION_ALIAS, 0, 10},
+        {"height", 'h', "HEIGHT", 0, "height of the minefield, default: 10", 10},
+        {0, 'y', 0, OPTION_ALIAS, 0, 10},
+        {"fullscreen", 'f', 0, 0, "use full screen size", 10},
+        {"", 0, 0, OPTION_DOC, "note: use either fullscreen or specify size explicitly (not both)", 10},
+
+        {0, 0, 0, 0, "Mines", 20},
+        {"mine-count", 'c', "NUM", 0, "number of mines to be placed", 20},
+        {"count", 0, 0, OPTION_ALIAS | OPTION_HIDDEN, 0, 20},
+        {"mine-density", 'd', "PERCENTAGE", 0, "density of mines to be placed, default: 16%. Specify as number between 0 and 100 (for percentages), omit '\%' charater", 20},
+        {"density", 0, 0, OPTION_ALIAS | OPTION_HIDDEN, 0, 20},
+        {"", 0, 0, OPTION_DOC, "note: use either mine density or specify mine count explicitly (not both)", 20},
+
+        {0, 0, 0, 0, "Other", 30},
+        {"autodiscover-only", 'a', 0, 0, "if enabled: fields can only be opened using autodiscover feature (see man)", 30},
+        {"seed", 's', "SEED", 0, "seed for field generation, suitable seed will be chosen by automatically", 30},
         {0, 0, 0, 0, 0, 0}
     };
-    struct argp argp = {options, parse_opt, 0, "Play Minesweeper on the terminal.\vControls:\nMovement    WASD, Arrow Keys, vimlike\nFlag Mine   F\nOpen Field  Space\nQuit        Q", 0, 0, 0};
+    struct argp argp = {options, parse_opt, 0, "Play Minesweeper on the terminal.\vControls:\nMovement    WASD, Arrow Keys, vimlike (HJKL)\nFlag Mine   F\nOpen Field  Space\nQuit        Q", 0, 0, 0};
 
     int argp_state = argp_parse(&argp, argc, argv, 0, 0, 0);
 
@@ -165,6 +207,12 @@ int main(int argc, char** argv) {
         err_report += "  Seed:              " + std::to_string(opts.seed) + "\n";
         err_report += "  Autodiscover only: ";
         if (opts.autodiscover_only) {
+            err_report += "enabled\n";
+        } else {
+            err_report += "disabled\n";
+        }
+        err_report += "  Fullscreen:        ";
+        if (opts.fullscreen) {
             err_report += "enabled\n";
         } else {
             err_report += "disabled\n";
