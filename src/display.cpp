@@ -343,10 +343,11 @@ Display::Display(int width, int height, int mine_count, int seed, bool autodisco
     } catch (std::runtime_error& e) {
         std::string msg = e.what();
         std::string keys_msg = "";
-        keys_msg = "Keypresses for error: ";
+        keys_msg = "Keypresses for error: >";
         for (auto key : pressed_keys) {
-            keys_msg += std::to_string((int) key) + ", ";
+            keys_msg += key;
         }
+        keys_msg += "<";
 
         throw std::runtime_error(msg + "\n\n" + keys_msg);
     }
