@@ -276,7 +276,7 @@ void Minefield::open(int x, int y, bool recursive) {
     if (recursive && !isMine(x, y) && (0 == getSorroundingMineCount(x, y))) {
         std::function<bool (int, int, std::vector<std::tuple<int, int>>&)> recursive_open = [&](int x, int y, std::vector<std::tuple<int, int>>& done){
             // stop on: invalid pos, already visited by recursive machine
-            std::tuple<int, int> coords_tuple = {x, y};
+            std::tuple<int, int> coords_tuple = std::make_tuple(x, y);
             if (! isPosValid(x, y)) {
                 return false;
             }
