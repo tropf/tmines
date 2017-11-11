@@ -9,10 +9,17 @@
 #include <exception>
 
 struct msgs_struct {
-    std::string won = "won";
-    std::string lost = "lost";
-    std::string running = "live";
-    std::string remaining_mines = "%mine_count% mines remaining";
+    std::string won;
+    std::string lost;
+    std::string running;
+    std::string remaining_mines;
+
+    msgs_struct() {
+        won = "won";
+        lost = "lost";
+        running = "live";
+        remaining_mines = "%mine_count% mines remaining";
+    }
 };
 
 /**
