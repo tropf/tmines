@@ -1,7 +1,7 @@
-#ifndef __INPUTDEVICE_STRING_H_INCLUDED__
-#define __INPUTDEVICE_STRING_H_INCLUDED__
+#ifndef __IODEVICE_STRING_H_INCLUDED__
+#define __IODEVICE_STRING_H_INCLUDED__
 
-#include "inputdevice.hpp"
+#include "iodevice.hpp"
 
 #include <string>
 #include <sstream>
@@ -11,15 +11,15 @@
  *
  * > Note: If no 'q' is send in the end will not return any char and the Display class will be stuck in waiting forever (blocking the control flow).
  */
-class InputdeviceString: public Inputdevice {
+class IODeviceString: public IODevice {
     private:
         std::stringstream input;
     public:
         /**
          * Set the Inputstream to use.
          */
-        InputdeviceString(std::string given_string);
+        IODeviceString(std::string given_string);
         char getChar();
 };
 
-#endif // __INPUTDEVICE_STRING_H_INCLUDED__
+#endif // __IODEVICE_STRING_H_INCLUDED__

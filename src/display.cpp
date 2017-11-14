@@ -1,7 +1,7 @@
 #include "display.hpp"
 
 #include "controller.hpp"
-#include "inputdevice.hpp"
+#include "iodevice.hpp"
 
 #include <iostream>
 #include <curses.h>
@@ -303,7 +303,7 @@ void Display::run() {
     }
 }
 
-Display::Display(std::shared_ptr<Inputdevice> given_input, int width, int height, int mine_count, int seed, bool autodiscover_only) {
+Display::Display(std::shared_ptr<IODevice> given_input, int width, int height, int mine_count, int seed, bool autodiscover_only) {
     controller = Controller(width, height, mine_count, seed, autodiscover_only);
     controller.putCursor((width - 1) / 2, (height - 1) / 2); // zero indexed, so subtract one before dividing
     exit = false;

@@ -1,9 +1,9 @@
-#ifndef __INPUTDEVICE_H_INCLUDED__
-#define __INPUTDEVICE_H_INCLUDED__
+#ifndef __IODEVICE_H_INCLUDED__
+#define __IODEVICE_H_INCLUDED__
 
-class Inputdevice {
+class IODevice {
     public:
-        virtual ~Inputdevice() {} 
+        virtual ~IODevice() {} 
 
         /**
          * Returns a pressed key to be handled by the display class.  
@@ -13,4 +13,4 @@ class Inputdevice {
         virtual char getChar() = 0;
 };
 
-#endif // __INPUTDEVICE_H_INCLUDED__
+#endif // __IODEVICE_H_INCLUDED__

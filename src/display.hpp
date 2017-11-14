@@ -2,13 +2,13 @@
 #define __DIPLAY_H_INCLUDED__
 
 #include "controller.hpp"
+#include "iodevice.hpp"
 
 #include <tuple>
 #include <string>
 #include <vector>
 #include <exception>
 #include <memory>
-#include <inputdevice.hpp>
 
 struct msgs_struct {
     std::string won;
@@ -35,7 +35,7 @@ class Display {
         bool exit;
         std::vector<std::vector<std::tuple<int, char>>> state, last_state;
         std::vector<char> pressed_keys;
-        std::shared_ptr<Inputdevice> input;
+        std::shared_ptr<IODevice> input;
 
         /**
          * Renders the Board of the Game according to state var.
@@ -107,7 +107,7 @@ class Display {
          * @param seed seed for the RNG
          * @param autodiscover_only if enabled, fields cannot be opened directly
          */
-        Display(std::shared_ptr<Inputdevice> given_input, int width, int height, int mine_count, int seed = 0, bool autodiscover_only = false);
+        Display(std::shared_ptr<IODevice> given_input, int width, int height, int mine_count, int seed = 0, bool autodiscover_only = false);
 
         /**
          * Returns a copy of the used Controller
