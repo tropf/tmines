@@ -1,15 +1,13 @@
 #include "display.hpp"
 
 #include "controller.hpp"
+#include "inputdevice.hpp"
 
 #include <iostream>
 #include <curses.h>
 #include <string>
 #include <algorithm>
 #include <exception>
-#include <iostream>
-
-#include <chrono>
 
 // mention here for linker
 const struct msgs_struct Display::msgs;
@@ -155,7 +153,7 @@ void Display::renderStatusline() {
 }
 
 int Display::getKey() {
-    return getch();
+    return (*input).getChar();
 }
 
 void Display::handleKey(int key) {
@@ -294,34 +292,23 @@ void Display::startWindow() {
 }
 
 void Display::run() {
-    unsigned long calc_time = 0;
-    unsigned long draw_time = 0;
-    unsigned long handle_time = 0;
-
     while(!exit) {
         // rendering process
         curs_set(0);
-        auto time_before_calc = std::chrono::system_clock::now();
         calculateStates();
-        auto time_before_render = std::chrono::system_clock::now();
         renderBoard();
-        auto time_after_render = std::chrono::system_clock::now();
         renderStatusline();
         updateCursor();
-        auto time_before_handle = std::chrono::system_clock::now();
         handleKey(getKey());
-        auto time_after_handle = std::chrono::system_clock::now();
-
-        calc_time += std::chrono::duration_cast<std::chrono::nanoseconds>(time_before_render - time_before_calc).count();
-        draw_time += std::chrono::duration_cast<std::chrono::nanoseconds>(time_after_render - time_before_render).count();
-        handle_time += std::chrono::duration_cast<std::chrono::nanoseconds>(time_after_handle - time_before_handle).count();
     }
 }
 
-Display::Display(int width, int height, int mine_count, int seed, bool autodiscover_only) {
+Display::Display(std::shared_ptr<Inputdevice> given_input, int width, int height, int mine_count, int seed, bool autodiscover_only) {
     controller = Controller(width, height, mine_count, seed, autodiscover_only);
     controller.putCursor((width - 1) / 2, (height - 1) / 2); // zero indexed, so subtract one before dividing
     exit = false;
+
+    input = given_input;
 
     // init state vars
     for (int x = 0; x < width; x++) {
@@ -353,5 +340,9 @@ Display::Display(int width, int height, int mine_count, int seed, bool autodisco
     }
 
     endwin();
+}
+
+Controller Display::getController() {
+    return controller;
 }
 

@@ -1,7 +1,8 @@
-#include <iostream>
-
 #include "display.hpp"
 #include "config.h"
+#include "inputdevice.hpp"
+#include "inputdevice_string.hpp"
+#include "inputdevice_curses.hpp"
 
 #include <string>
 #include <argp.h>
@@ -161,7 +162,8 @@ void run() {
         opts.mine_count = get_minecount_for_size(opts.width, opts.height);
     }
 
-    Display(opts.width, opts.height, opts.mine_count, opts.seed, opts.autodiscover_only);
+    std::shared_ptr<Inputdevice> idevice_ptr = std::make_shared<InputdeviceCurses>(InputdeviceCurses());
+    Display(idevice_ptr, opts.width, opts.height, opts.mine_count, opts.seed, opts.autodiscover_only);
 }
 
 int main(int argc, char** argv) {

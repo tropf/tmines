@@ -51,6 +51,9 @@ add_library(minefield src/minefield.cpp)
 add_library(controller src/controller.cpp)
 add_library(display src/display.cpp)
 
+add_library(inputdevice_curses src/inputdevice_curses.cpp)
+add_library(inputdevice_string src/inputdevice_string.cpp)
+
 find_package(Curses REQUIRED)
 include_directories(${CURSES_INCLUDE_DIRS})
 
@@ -61,6 +64,8 @@ add_subdirectory(doc)
 target_link_libraries(tmines display)
 target_link_libraries(tmines controller)
 target_link_libraries(tmines minefield)
+target_link_libraries(tmines inputdevice_string)
+target_link_libraries(tmines inputdevice_curses)
 target_link_libraries(tmines ${CURSES_LIBRARIES})
 
 install(TARGETS tmines DESTINATION bin)
