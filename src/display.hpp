@@ -35,7 +35,7 @@ class Display {
         bool exit;
         std::vector<std::vector<std::tuple<int, char>>> state, last_state;
         std::vector<char> pressed_keys;
-        std::shared_ptr<IODevice> input;
+        std::shared_ptr<IODevice> io;
 
         /**
          * Renders the Board of the Game according to state var.
@@ -100,14 +100,14 @@ class Display {
         static const struct msgs_struct msgs;
         /**
          * Constructor. Automatically takes over the window. (Is blocking)
-         * @param given_input an input device to read the controls from
+         * @param given_iodevice an IO-device to read the controls from and display the output to
          * @param width the width of the mine matrix
          * @param height the height of the mine matrix
          * @param mine_count the mine count of the mine matrix
          * @param seed seed for the RNG
          * @param autodiscover_only if enabled, fields cannot be opened directly
          */
-        Display(std::shared_ptr<IODevice> given_input, int width, int height, int mine_count, int seed = 0, bool autodiscover_only = false);
+        Display(std::shared_ptr<IODevice> given_iodevice, int width, int height, int mine_count, int seed = 0, bool autodiscover_only = false);
 
         /**
          * Returns a copy of the used Controller

@@ -21,11 +21,11 @@ void Display::renderBoard() {
                 char to_print;
                 std::tie(color, to_print) = state[x][y];
 
-                color_set(color, 0);
+                io->setColor(color);
 
                 int x_to_print, y_to_print;
                 std::tie(x_to_print, y_to_print) = getConsolePosition(x, y);
-                mvaddch(y_to_print, x_to_print, to_print);
+                io->putString(x_to_print, y_to_print, to_print);
 
                 last_state[x][y] = state[x][y];
             }
@@ -140,20 +140,20 @@ void Display::renderStatusline() {
     std::tie(x, y) = getConsolePosition(0, mfield.getYDimension() + 1);
 
     color_set(0, 0);
-    mvaddstr(y, x, std::string(getMaxTextWidth(mfield.getMineCount()), ' ').c_str());
+    io->putString(x, y, std::string(getMaxTextWidth(mfield.getMineCount()), ' '));
 
-    color_set(color_to_use, 0);
-    mvaddstr(y, x, game_state.c_str());
+    io->setColor(color_to_use);
+    io->putString(x, y, game_state);
 
     std::tie(x, y) = getConsolePosition(0, mfield.getYDimension() + 2);
-    color_set(0, 0);
-    mvaddstr(y, x, std::string(getMaxTextWidth(mfield.getMineCount()), ' ').c_str());
-    color_set(12, 0);
-    mvaddstr(y, x, remaining_mines.c_str());
+    io->setColor(0);
+    io->putString(x, y, std::string(getMaxTextWidth(mfield.getMineCount()), ' '));
+    io->setColor(12);
+    io->putString(x, y, remaining_mines);
 }
 
 int Display::getKey() {
-    return (*input).getChar();
+    return io->getChar();
 }
 
 void Display::handleKey(int key) {
@@ -189,12 +189,12 @@ void Display::handleKey(int key) {
 void Display::updateCursor() {
     int x, y;
     std::tie(x, y) = getConsolePosition(controller.getX(), controller.getY());
-    move(y, x);
+    io->moveCursor(x, y);
 
     if (controller.getMinefield().isGameEnded()) {
-        curs_set(0);
+        io->setCursorVisibility(0);
     } else {
-        curs_set(1);
+        io->setCursorVisibility(1);
     }
 }
 
@@ -237,11 +237,11 @@ void Display::checkWindowSize() {
     int minefield_height = controller.getHeight();
     int mine_count = controller.getMinefield().getMineCount();
 
-    if (!isWindowSizeSufficient(minefield_width, minefield_height, mine_count, COLS, LINES)) {
+    if (!isWindowSizeSufficient(minefield_width, minefield_height, mine_count, io->getWidth(), io->getHeight())) {
         int required_width, required_height;
         std::tie(required_width, required_height) = getRequiredWindowSize(minefield_width, minefield_height, mine_count);
 
-        throw std::runtime_error(std::to_string(required_width) + "x" + std::to_string(required_height) + " terminal required to display this minefield (Current: " + std::to_string(COLS) + "x" + std::to_string(LINES) + ")");
+        throw std::runtime_error(std::to_string(required_width) + "x" + std::to_string(required_height) + " terminal required to display this minefield (Current: " + std::to_string(io->getWidth()) + "x" + std::to_string(io->getHeight()) + ")");
     }
 }
 
@@ -254,10 +254,22 @@ void Display::redrawWindow() {
         }
     }
 
-    clear();
-    refresh();
+    if (!io) {
+        throw std::runtime_error("OMG io is NULL");
+    }
+    io->clear();
+    if (!io) {
+        throw std::runtime_error("OMG io is NULL");
+    }
+    io->refresh();
 
-    endwin();
+    if (!io) {
+        throw std::runtime_error("OMG io is NULL");
+    }
+    io->endWindow();
+    if (!io) {
+        throw std::runtime_error("OMG io is NULL");
+    }
     startWindow();
 
     renderBoard();
@@ -266,35 +278,49 @@ void Display::redrawWindow() {
 }
 
 void Display::startWindow() {
-    initscr();
-    noecho();
-    start_color();
-    keypad(stdscr, TRUE);
-    cbreak();
+    if (!io) {
+        throw std::runtime_error("OMG io is NULL");
+    }
+    io->initWindow();
+    if (!io) {
+        throw std::runtime_error("OMG io is NULL");
+    }
+    io->setEcho(false);
+    io->startColor();
+    if (!io) {
+        throw std::runtime_error("OMG io is NULL");
+    }
+    io->startSpecialKeys();
 
+    if (!io) {
+        throw std::runtime_error("OMG io is NULL");
+    }
     checkWindowSize();
 
-    init_pair(0, COLOR_WHITE, COLOR_BLACK);
-    init_pair(1, COLOR_BLUE, COLOR_BLACK);
-    init_pair(2, COLOR_GREEN, COLOR_BLACK);
-    init_pair(3, COLOR_RED, COLOR_BLACK);
-    init_pair(4, COLOR_CYAN, COLOR_BLACK);
-    init_pair(5, COLOR_RED, COLOR_BLACK);
-    init_pair(6, COLOR_CYAN, COLOR_BLACK);
-    init_pair(7, COLOR_MAGENTA, COLOR_BLACK);
-    init_pair(8, COLOR_CYAN, COLOR_BLACK);
-    init_pair(10, COLOR_WHITE, COLOR_BLACK);
-    init_pair(11, COLOR_WHITE, COLOR_RED);
-    init_pair(12, COLOR_YELLOW, COLOR_BLACK);
-    init_pair(13, COLOR_GREEN, COLOR_BLACK);
+    io->addColor(0, COLOR_WHITE, COLOR_BLACK);
+    io->addColor(1, COLOR_BLUE, COLOR_BLACK);
+    io->addColor(2, COLOR_GREEN, COLOR_BLACK);
+    io->addColor(3, COLOR_RED, COLOR_BLACK);
+    io->addColor(4, COLOR_CYAN, COLOR_BLACK);
+    io->addColor(5, COLOR_RED, COLOR_BLACK);
+    io->addColor(6, COLOR_CYAN, COLOR_BLACK);
+    io->addColor(7, COLOR_MAGENTA, COLOR_BLACK);
+    io->addColor(8, COLOR_CYAN, COLOR_BLACK);
+    io->addColor(10, COLOR_WHITE, COLOR_BLACK);
+    io->addColor(11, COLOR_WHITE, COLOR_RED);
+    io->addColor(12, COLOR_YELLOW, COLOR_BLACK);
+    io->addColor(13, COLOR_GREEN, COLOR_BLACK);
 
-    bkgd(COLOR_PAIR(10));
+    io->setBackground(10);
 }
 
 void Display::run() {
     while(!exit) {
         // rendering process
-        curs_set(0);
+    if (!io) {
+        throw std::runtime_error("OMG io is NULL");
+    }
+        io->setCursorVisibility(0);
         calculateStates();
         renderBoard();
         renderStatusline();
@@ -303,12 +329,12 @@ void Display::run() {
     }
 }
 
-Display::Display(std::shared_ptr<IODevice> given_input, int width, int height, int mine_count, int seed, bool autodiscover_only) {
+Display::Display(std::shared_ptr<IODevice> given_iodevice, int width, int height, int mine_count, int seed, bool autodiscover_only) {
     controller = Controller(width, height, mine_count, seed, autodiscover_only);
     controller.putCursor((width - 1) / 2, (height - 1) / 2); // zero indexed, so subtract one before dividing
     exit = false;
 
-    input = given_input;
+    io = given_iodevice;
 
     // init state vars
     for (int x = 0; x < width; x++) {
@@ -323,10 +349,16 @@ Display::Display(std::shared_ptr<IODevice> given_input, int width, int height, i
 
     try {
         startWindow();
+    if (!io) {
+        throw std::runtime_error("OMG io is NULL");
+    }
         run();
         // clear window, so not the entire screen is filled w/ the field after quitting
-        clear();
-        refresh();
+    if (!io) {
+        throw std::runtime_error("OMG io is NULL");
+    }
+        io->clear();
+        io->refresh();
     } catch (std::runtime_error& e) {
         std::string msg = e.what();
         std::string keys_msg = "";
@@ -339,7 +371,10 @@ Display::Display(std::shared_ptr<IODevice> given_input, int width, int height, i
         throw std::runtime_error(msg + "\n\n" + keys_msg);
     }
 
-    endwin();
+    if (!io) {
+        throw std::runtime_error("OMG io is NULL");
+    }
+    io->endWindow();
 }
 
 Controller Display::getController() {
