@@ -32,11 +32,11 @@ int IODeviceCurses::getWidth() {
 }
 
 void IODeviceCurses::clear() {
-    clear();
+    ::clear();
 }
 
 void IODeviceCurses::refresh() {
-    refresh();
+    ::refresh();
 }
 
 void IODeviceCurses::initWindow() {
