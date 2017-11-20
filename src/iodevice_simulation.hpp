@@ -41,8 +41,6 @@ class IODeviceSimulation: public IODevice {
          */
         void checkPos(int x, int y);
     public:
-        IODeviceSimulation();
-
         // methods for input simulation content
 
         /**
