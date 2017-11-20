@@ -99,7 +99,7 @@ class IODeviceSimulation: public IODevice {
          * There may be null characters.
          * @returns 2-dimensional array w/ all printed chars (may have null characters)
          */
-        std::vector<std::vector<char>> getChars();
+        std::vector<std::vector<char>> getPrintedChars();
 
         /**
          * Returns the char at the given pos, might be null character.
@@ -107,7 +107,7 @@ class IODeviceSimulation: public IODevice {
          * @param y y coordinate
          * @returns character printed at the given pos, might be null
          */
-        int getChars(int x, int y);
+        int getPrintedChar(int x, int y);
 
         // methods from interface
 
