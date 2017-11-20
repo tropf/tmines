@@ -1,14 +1,13 @@
-#include "iodevice_string.hpp"
+#include "iodevice_simulation.hpp"
 
 #include <string>
 #include <sstream>
 #include <stdexcept>
 
-IODeviceString::IODeviceString(std::string given_string) {
-    input << given_string;
+IODeviceSimulation::IODeviceSimulation() {
 }
 
-char IODeviceString::getChar() {
+char IODeviceSimulation::getChar() {
     return input.get();
 }
 
