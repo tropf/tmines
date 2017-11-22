@@ -26,14 +26,6 @@ class IODeviceSimulation: public IODevice {
         std::vector<std::vector<char>> chars;
 
         /**
-         * Calculates, wether given coords represent a valid spot that can be printed to.
-         * @param x x coordinate
-         * @param y y coordinate
-         * @returns wheter given pos can be printed to
-         */
-        bool isPosValid(int x, int y);
-
-        /**
          * Throws if given coordinates are invalid
          * @param x x coordinate
          * @param y y coordinate
@@ -42,6 +34,14 @@ class IODeviceSimulation: public IODevice {
         void checkPos(int x, int y);
     public:
         // methods for input simulation content
+
+        /**
+         * Calculates, wether given coords represent a valid spot that can be printed to.
+         * @param x x coordinate
+         * @param y y coordinate
+         * @returns wheter given pos can be printed to
+         */
+        bool isPosValid(int x, int y);
 
         /**
          * Adds a char to be read from std::cin, same as pressing a button

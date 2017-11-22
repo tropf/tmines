@@ -139,6 +139,7 @@ void Display::renderStatusline() {
     int x, y;
     std::tie(x, y) = getConsolePosition(0, mfield.getYDimension() + 1);
 
+    // TODO CHANGE
     color_set(0, 0);
     io->putString(x, y, std::string(getMaxTextWidth(mfield.getMineCount()), ' '));
 

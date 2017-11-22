@@ -16,7 +16,7 @@ void IODeviceCurses::putString(int x, int y, std::string to_print) {
 }
 
 void IODeviceCurses::moveCursor(int x, int y) {
-    move(y, x) ;
+    move(y, x);
 }
 
 void IODeviceCurses::setCursorVisibility(int visibility) {
