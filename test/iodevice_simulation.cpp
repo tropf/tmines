@@ -49,11 +49,17 @@ TEST_CASE("Add Char Test") {
 
 TEST_CASE("Dimensions Test, setDim()+isPosValid()") {
     IODeviceSimulation io;
+    io.initWindow();
 
     io.setDim(5, 5);
+
     CHECK(5 == io.getWidth());
     CHECK(5 == io.getHeight());
     CHECK(io.isPosValid(4, 4));
+    CHECK_NOTHROW(io.putString(0, 2, "01234"));
+    CHECK_NOTHROW(io.putString(2, 2, "234"));
+    CHECK_THROWS(io.putString(0, 2, "01234-"));
+    CHECK_THROWS(io.putString(2, 2, "234-"));
 
     CHECK(! io.isPosValid(5, 4));
     CHECK(! io.isPosValid(4, 5));
@@ -73,6 +79,7 @@ TEST_CASE("Dimensions Test, setDim()+isPosValid()") {
     CHECK(io.isPosValid(3, 3));
 
     // fill w/ example data
+    io.startColor();
     io.setDim(10, 10);
     io.addColor(17, 0, 7);
     io.addColor(42, 4, 5);
@@ -80,6 +87,14 @@ TEST_CASE("Dimensions Test, setDim()+isPosValid()") {
     io.putString(0, 0, "0123456789");
     io.setColor(42);
     io.putString(0, 1, "abcdefgh");
+
+    CHECK_THROWS(io.putString(0, 2, "76126187269138746193413"));
+    CHECK_THROWS(io.putString(0, 2, "0123456789ß"));
+    CHECK_NOTHROW(io.putString(0, 2, "0123456789"));
+
+    CHECK_THROWS(io.putString(5, 2, "0123456789"));
+    CHECK_THROWS(io.putString(1, 2, "0123456789"));
+    CHECK_NOTHROW(io.putString(1, 2, "012345678"));
 
     io.setDim(9, 1);
     CHECK(9 == io.getWidth());
@@ -112,8 +127,8 @@ TEST_CASE("Dimensions Test, setDim()+isPosValid()") {
     CHECK_NOTHROW(bg[0][0]);
     CHECK_NOTHROW(bg[8][0]);
 
-    CHECK_NOTHROW(io.getPrintedChar(0, 8));
-    CHECK_THROWS(io.getPrintedChar(0, 9));
+    CHECK_NOTHROW(io.getPrintedChar(8, 0));
+    CHECK_THROWS(io.getPrintedChar(9, 0));
     
     CHECK_THROWS(io.setDim(0, 0));
     CHECK_THROWS(io.setDim(0, 6));
@@ -130,6 +145,7 @@ TEST_CASE("Dimensions Test, setDim()+isPosValid()") {
 TEST_CASE("Color Test") {
     IODeviceSimulation io;
     io.setDim(10, 10);
+    io.initWindow();
 
     CHECK_THROWS(io.addColor(0, 0, 10));
     CHECK_THROWS(io.setColor(0));
@@ -218,9 +234,9 @@ TEST_CASE("Color Test") {
     CHECK(0 == io.getForeground(3, 3));
     CHECK(4 == io.getForeground(4, 4));
 
-    CHECK(0 == io.getBackground(0, 0));
-    CHECK(1 == io.getBackground(1, 1));
-    CHECK(2 == io.getBackground(2, 2));
+    CHECK(10 == io.getBackground(0, 0));
+    CHECK(11 == io.getBackground(1, 1));
+    CHECK(12 == io.getBackground(2, 2));
     CHECK(7 == io.getBackground(3, 3));
     CHECK(5 == io.getBackground(4, 4));
 
@@ -234,9 +250,9 @@ TEST_CASE("Color Test") {
     CHECK(0 == io.getForeground(3, 3));
     CHECK(4 == io.getForeground(4, 4));
 
-    CHECK(0 == io.getBackground(0, 0));
-    CHECK(1 == io.getBackground(1, 1));
-    CHECK(2 == io.getBackground(2, 2));
+    CHECK(10 == io.getBackground(0, 0));
+    CHECK(11 == io.getBackground(1, 1));
+    CHECK(12 == io.getBackground(2, 2));
     CHECK(7 == io.getBackground(3, 3));
     CHECK(5 == io.getBackground(4, 4));
 
@@ -250,9 +266,9 @@ TEST_CASE("Color Test") {
     CHECK(0 == io.getForeground(3, 3));
     CHECK(4 == io.getForeground(4, 4));
 
-    CHECK(0 == io.getBackground(0, 0));
-    CHECK(1 == io.getBackground(1, 1));
-    CHECK(2 == io.getBackground(2, 2));
+    CHECK(10 == io.getBackground(0, 0));
+    CHECK(11 == io.getBackground(1, 1));
+    CHECK(12 == io.getBackground(2, 2));
     CHECK(7 == io.getBackground(3, 3));
     CHECK(5 == io.getBackground(4, 4));
 
@@ -266,9 +282,9 @@ TEST_CASE("Color Test") {
     CHECK(0 == io.getForeground(3, 3));
     CHECK(4 == io.getForeground(4, 4));
 
-    CHECK(0 == io.getBackground(0, 0));
-    CHECK(1 == io.getBackground(1, 1));
-    CHECK(2 == io.getBackground(2, 2));
+    CHECK(10 == io.getBackground(0, 0));
+    CHECK(11 == io.getBackground(1, 1));
+    CHECK(12 == io.getBackground(2, 2));
     CHECK(7 == io.getBackground(3, 3));
     CHECK(5 == io.getBackground(4, 4));
 
@@ -282,9 +298,9 @@ TEST_CASE("Color Test") {
     CHECK(0 == io.getForeground(3, 3));
     CHECK(4 == io.getForeground(4, 4));
 
-    CHECK(0 == io.getBackground(0, 0));
-    CHECK(1 == io.getBackground(1, 1));
-    CHECK(2 == io.getBackground(2, 2));
+    CHECK(10 == io.getBackground(0, 0));
+    CHECK(11 == io.getBackground(1, 1));
+    CHECK(12 == io.getBackground(2, 2));
     CHECK(7 == io.getBackground(3, 3));
     CHECK(5 == io.getBackground(4, 4));
 
@@ -296,6 +312,7 @@ TEST_CASE("Color Test") {
 TEST_CASE("Move Cursor") {
     IODeviceSimulation io;
     io.setDim(10, 10);
+    io.initWindow();
 
     CHECK_NOTHROW(io.moveCursor(0, 0));
     CHECK_NOTHROW(io.moveCursor(9, 0));
@@ -331,6 +348,8 @@ TEST_CASE("Move Cursor") {
 
 TEST_CASE("Set Visibility") {
     IODeviceSimulation io;
+    io.initWindow();
+
     CHECK_NOTHROW(io.setCursorVisibility(0));
     CHECK_NOTHROW(io.setCursorVisibility(1));
     CHECK_NOTHROW(io.setCursorVisibility(2));
@@ -346,6 +365,7 @@ TEST_CASE("Set Visibility") {
 TEST_CASE("Test Clear") {
     IODeviceSimulation io;
     io.setDim(10, 10);
+    io.initWindow();
     
     io.putString(0, 0, "Hallo");
     io.putString(1, 1, "Welt!");
@@ -379,48 +399,23 @@ TEST_CASE("init & end") {
     io.endWindow();
     CHECK_THROWS(io.putString(0, 0, "Hallo W!"));
 
-    // accross objects
-    IODeviceSimulation io2;
-
     CHECK_THROWS(io.putString(0, 0, "Hallo W!"));
-    CHECK_THROWS(io2.putString(1, 1, "Hallo W!"));
 
-    io2.initWindow();
+    io.initWindow();
 
     CHECK_NOTHROW(io.putString(0, 0, "Hallo W!"));
-    CHECK_NOTHROW(io2.putString(1, 1, "Hallo W!"));
+    CHECK_NOTHROW(io.putString(1, 1, "Hallo W!"));
 
     io.endWindow();
 
     CHECK_THROWS(io.putString(0, 0, "Hallo W!"));
-    CHECK_THROWS(io2.putString(1, 1, "Hallo W!"));
-}
-
-TEST_CASE("no end") {
-    // throw if window is not finished
-    CHECK_THROWS({
-        // block for scoping
-        IODeviceSimulation io;
-
-        io.initWindow();
-    });
-
-    // does not throw if no window is ever started
-    CHECK_NOTHROW({
-        IODeviceSimulation io;
-    });
-
-    // and no throw on started+ended window
-    CHECK_NOTHROW({
-        IODeviceSimulation io;
-        io.initWindow();
-        io.endWindow();
-    });
+    CHECK_THROWS(io.putString(1, 1, "Hallo W!"));
 }
 
 TEST_CASE("misc") {
     // test that function exists
     IODeviceSimulation io;
+    io.initWindow();
     CHECK_NOTHROW(io.startSpecialKeys());
     CHECK_NOTHROW(io.setEcho(true));
     CHECK_NOTHROW(io.setEcho(true));

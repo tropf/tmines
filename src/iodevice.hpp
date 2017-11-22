@@ -49,6 +49,7 @@ class IODevice {
          * Sets the visibility of the cursor.
          * 0...hidden, 1...visible, 2...extra visible
          * @param visibility the visibility value to be set
+         * @throws std::exception if given visibility value is not allowed
          */
         virtual void setCursorVisibility(int visibility) = 0;
 

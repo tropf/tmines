@@ -6,6 +6,8 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include <map>
+#include <tuple>
 
 /**
  * Can be used to simulate user Input and screen Output for 
@@ -25,6 +27,20 @@ class IODeviceSimulation: public IODevice {
         /// printed output
         std::vector<std::vector<char>> chars;
 
+        /// wether color mode is active
+        bool colorMode = false;
+
+        /// wether curses mode is activated (any output can be done)
+        bool windowActive = false;
+
+        /// code of current color
+        int currentColor = 0;
+
+        /// color pairs id -> (foreground, background)
+        std::map<int, std::tuple<int, int>> colors = {
+            {0, std::make_tuple(0, 0)}
+        };
+
         /**
          * Throws if given coordinates are invalid
          * @param x x coordinate
@@ -32,6 +48,19 @@ class IODeviceSimulation: public IODevice {
          * @throws std::exception if given position is invalid
          */
         void checkPos(int x, int y);
+
+        /**
+         * Throws if colormode is not currently enabled.
+         * @throws std::exception if color mode is disabled
+         */
+        void checkColorMode();
+
+        /**
+         * Throws if the curses mode is not activated == initWindow has not been called and no i/o action can be performed.
+         * @throws std::exception if initWindow has not been called
+         */
+        void checkWindowActive();
+
     public:
         // methods for input simulation content
 
