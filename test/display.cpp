@@ -427,8 +427,60 @@ TEST_CASE("Dimension calculations") {
     }
 }
 
-TEST_CASE("Printout") {
+TEST_CASE("Printout Mines") {
     // checks that the actual state of the minefield gets printed
+    auto io = std::make_shared<IODeviceSimulation>(IODeviceSimulation());
+    io->setDim(100, 100);
+    
+    // no way to describe here whats going on
+    // just launch w/ -x 8 -y 8 -c 10 -s 0
+    io->addChars(" w sssdd waafw dds ");
+    // end game on crash (default exit clears the screen)
+    io->addChar(KEY_RESIZE);
+    io->mockResize();
+    CHECK_THROWS(Display display(io, 8, 8, 10, 0, false));
+
+    // unmock resize
+    io->mockResize(-1);
+
+    // check a 1: blue, black
+    struct expected_point{
+        int x, y;
+        int fg, bg;
+        int content;
+    };
+    std::vector<struct expected_point> to_test = {
+        {3, 3, COLOR_BLUE, COLOR_BLACK, '1'},
+        {6, 1, COLOR_BLUE, COLOR_BLACK, '1'},
+        {2, 4, COLOR_GREEN, COLOR_BLACK, '2'},
+        {5, 3, COLOR_GREEN, COLOR_BLACK, '2'},
+        {4, 4, COLOR_RED, COLOR_BLACK, '3'},
+        {6, 3, COLOR_RED, COLOR_BLACK, '3'},
+        {5, 5, COLOR_CYAN, COLOR_BLACK, '4'},
+        {3, 4, COLOR_WHITE, COLOR_BLACK, '?'},
+        {0, 0, COLOR_WHITE, COLOR_BLACK, ' '},
+        {1, 3, COLOR_WHITE, COLOR_BLACK, ' '},
+        {7, 7, COLOR_WHITE, COLOR_BLACK, '*'},
+        {2, 6, COLOR_WHITE, COLOR_BLACK, '*'},
+        {6, 6, COLOR_WHITE, COLOR_RED, 'X'},
+        {5, 0, COLOR_WHITE, COLOR_RED, 'X'},
+    };
+
+    // reactivate, display ends window
+    io->initWindow();
+
+    for (auto expected : to_test) {
+        int console_x, console_y;
+        std::tie(console_x, console_y) = Display::getConsolePosition(expected.x, expected.y);
+
+        CHECK(io->getForeground(console_x, console_y) == expected.fg);
+        CHECK(io->getBackground(console_x, console_y) == expected.bg);
+        CHECK(io->getPrintedChar(console_x, console_y) == expected.content);
+    }
+}
+
+TEST_CASE("Printout Statusbar") {
+    // checks that the status bar display the current status of the game
 }
 
 TEST_CASE("Error Reports") {
