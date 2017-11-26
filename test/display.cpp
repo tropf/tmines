@@ -7,6 +7,7 @@
 
 #include <memory>
 #include <curses.h>
+#include <string>
 
 TEST_CASE("Finish on Q") {
     // prep iodevice
@@ -421,7 +422,6 @@ TEST_CASE("Dimension calculations") {
             int field_width, field_height, mine_cnt;
             std::tie(field_width, field_height, mine_cnt) = Display::getMaximumFieldsize(width, height);
             io->addChar('q');
-            //MESSAGE("Displaying: " + std::to_string(field_width) + "x" + std::to_string(field_height) + ", " + std::to_string(mine_cnt) + " mines");
             CHECK_NOTHROW(Display(io, field_width, field_height, mine_cnt));
         }
     }
@@ -433,6 +433,37 @@ TEST_CASE("Printout") {
 
 TEST_CASE("Error Reports") {
     // checks that useful error reports are thrown
+    auto io = std::make_shared<IODeviceSimulation>(IODeviceSimulation());
+    io->setDim(100, 100);
+
+    // check that keys are anonymized in crash reports
+    io->addChars("wasdWASDhjklHJKLrRrRfFfFfF   fF");
+    io->addChar(KEY_UP);
+    io->addChar(KEY_LEFT);
+    io->addChar(KEY_DOWN);
+    io->addChar(KEY_RIGHT);
+
+    io->addChars("FFF");
+
+    io->addChar(KEY_RESIZE);
+
+    // fallback
+    io->addChar('q');
+
+    // when KEY_RESIZE is pulled from stack, resize screen to 1
+    io->mockResize();
+    
+    // containing start and end markers ">abc<" instead of "abc"
+    std::string expected_msg = ">khjlkhjlhjklhjklrrrrffffff   ffkhjlfff-<";
+    try {
+        Display(io, 8, 8, 1);
+        FAIL("Display didn't throw");
+    } catch (std::exception &e) {
+        // check that message contains all keypresses
+        std::string err_msg(e.what());
+
+        CHECK(err_msg.find(expected_msg) != std::string::npos);
+    }
 }
 
 TEST_CASE("Check passing") {

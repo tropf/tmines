@@ -5,6 +5,7 @@
 
 #include <thread>
 #include <chrono>
+#include <curses.h>
 
 TEST_CASE("Add Char Test") {
     IODeviceSimulation io;
@@ -524,4 +525,73 @@ TEST_CASE("misc") {
     CHECK(! io.isEchoMode());
 
     io.endWindow();
+}
+
+TEST_CASE("mock resize") {
+    IODeviceSimulation io;
+    io.setDim(13, 37);
+    io.initWindow();
+    io.addChar(KEY_RESIZE);
+    io.addChar('a');
+    io.addChar(KEY_RESIZE);
+    io.addChar(KEY_RESIZE);
+    io.addChar(KEY_RESIZE);
+
+    CHECK(13 == io.getWidth());
+    CHECK(37 == io.getHeight());
+    CHECK(13 == io.getWidth());
+    CHECK(37 == io.getHeight());
+    CHECK(13 == io.getWidth());
+
+    CHECK(KEY_RESIZE == io.getChar());
+
+    CHECK(37 == io.getHeight());
+    CHECK(13 == io.getWidth());
+    CHECK(37 == io.getHeight());
+    CHECK(13 == io.getWidth());
+    CHECK(37 == io.getHeight());
+
+    io.mockResize();
+
+    CHECK(37 == io.getHeight());
+    CHECK(13 == io.getWidth());
+
+    CHECK('a' == io.getChar());
+
+    CHECK(37 == io.getHeight());
+    CHECK(13 == io.getWidth());
+    CHECK(13 == io.getWidth());
+
+    CHECK(KEY_RESIZE == io.getChar());
+
+    CHECK(1 == io.getWidth());
+    CHECK(1 == io.getHeight());
+    CHECK(1 == io.getWidth());
+    CHECK(1 == io.getHeight());
+
+    io.mockResize(1);
+    CHECK(37 == io.getHeight());
+    CHECK(13 == io.getWidth());
+    CHECK(37 == io.getHeight());
+    CHECK(13 == io.getWidth());
+
+    CHECK(KEY_RESIZE == io.getChar());
+
+    CHECK(1 == io.getHeight());
+    CHECK(1 == io.getWidth());
+
+    io.mockResize(0);
+    CHECK(1 == io.getWidth());
+    CHECK(1 == io.getHeight());
+
+    io.mockResize(-1);
+    CHECK(13 == io.getWidth());
+    CHECK(37 == io.getHeight());
+    
+    CHECK(KEY_RESIZE == io.getChar());
+
+    CHECK(13 == io.getWidth());
+    CHECK(37 == io.getHeight());
+    CHECK(13 == io.getWidth());
+    CHECK(37 == io.getHeight());
 }

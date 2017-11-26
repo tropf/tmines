@@ -7,6 +7,7 @@
 #include <map>
 #include <tuple>
 #include <algorithm>
+#include <curses.h>
 
 void IODeviceSimulation::checkColorMode() {
     if (!colorMode) {
@@ -27,6 +28,11 @@ int IODeviceSimulation::getChar() {
     }
     c = input.front();
     input.pop_front();
+
+    // KEY_RESIZE
+    if (mockRemaining > 0 && KEY_RESIZE == c) {
+        mockRemaining = 0;
+    } 
     return c;
 }
 
@@ -191,6 +197,10 @@ void IODeviceSimulation::setCursorVisibility(int visibility){
 
 int IODeviceSimulation::getHeight(){
     checkWindowActive();
+    if (0 == mockRemaining) {
+        return 1;
+    }
+
     if (getWidth() > 0) {
         return chars[0].size();
     } else {
@@ -200,6 +210,9 @@ int IODeviceSimulation::getHeight(){
 
 int IODeviceSimulation::getWidth(){
     checkWindowActive();
+    if (0 == mockRemaining) {
+        return 1;
+    }
     return chars.size();
 }
 
@@ -239,7 +252,6 @@ void IODeviceSimulation::setEcho(bool enabled){
 void IODeviceSimulation::startColor(){
     colorMode = true;
 }
-
 void IODeviceSimulation::startSpecialKeys(){
     checkWindowActive();
     specialKeysEnabled = true;
@@ -271,4 +283,8 @@ void IODeviceSimulation::setBackground(int id){
             }
         }
     }
+}
+
+void IODeviceSimulation::mockResize(int remainder) {
+    mockRemaining = remainder;
 }

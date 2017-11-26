@@ -79,6 +79,20 @@ class IODeviceSimulation: public IODevice {
         /// wether special keys have been enabled
         bool specialKeysEnabled = false;
 
+        /// states if the dimensions should be mocked
+        /**
+         * This Var indicates the state of mocking getHeight() and getWidth() values as 1.
+         *
+         * 0 ... Active Mocking, getHeight() and getWidth() return 1  
+         * -1 ... No Mocking Should be done.  
+         *  1 ... Currently no mocking. When a KEY_RESIZE is pulled via getChar(), the value changes to 0.
+         *
+         * Any Number > 0 counts like 1, any < 0 like -1.
+         *
+         * > This can be used to mock a screen resize, to provoke a crash of the display class.
+         */
+        int mockRemaining = -1;
+
         /**
          * Throws if given coordinates are invalid
          * @param x x coordinate
@@ -244,10 +258,22 @@ class IODeviceSimulation: public IODevice {
 
         /**
          * Returns the internal storage of the color pairs as map.  
-         * `id-> (foreground, background)`
+         * `id -> (foreground, background)`
          * @returns the added color pairs
          */
         std::map<int, std::tuple<int, int>> getColorPairs();
+
+        /**
+         * When called, after getChar has return KEY_RESIZE (from curses.h), getWidth() and getHeigh() will both return 1 all the time.
+         * If this method has been called but not getChar, then getWidth() and getHeight() will return their normal values.
+         *
+         * To stop the mocking, pass -1.
+         *
+         * > This method can be used to mock a resize and provoke a crash of the display class.
+         *
+         * @param remainder -1 for no mocking, 0 for instant mocking and any value >0 for mocking on next getChar() of KEY_RESIZE
+         */
+        void mockResize(int remainder = 1);
 
         // methods from interface
 
