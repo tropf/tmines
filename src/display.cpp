@@ -8,6 +8,8 @@
 #include <string>
 #include <algorithm>
 #include <exception>
+#include <cmath>
+#include <limits>
 
 // mention here for linker
 const struct msgs_struct Display::msgs;
@@ -89,6 +91,9 @@ bool replace(std::string& str, const std::string& from, const std::string& to) {
 }
 
 int Display::getMaxTextWidth(int mine_count) {
+    if (mine_count < 0) {
+        throw std::runtime_error("can't display mine counts < 0");
+    }
     std::vector<int> all_lengths = {0};
     
     all_lengths.push_back(msgs.won.length());
@@ -240,9 +245,8 @@ void Display::checkWindowSize() {
 
     if (!isWindowSizeSufficient(minefield_width, minefield_height, mine_count, io->getWidth(), io->getHeight())) {
         int required_width, required_height;
-        std::tie(required_width, required_height) = getRequiredWindowSize(minefield_width, minefield_height, mine_count);
-
-        throw std::runtime_error(std::to_string(required_width) + "x" + std::to_string(required_height) + " terminal required to display this minefield (Current: " + std::to_string(io->getWidth()) + "x" + std::to_string(io->getHeight()) + ")");
+        std::tie(required_width, required_height) = getRequiredWindowSize(minefield_width, minefield_height, mine_count); 
+        throw std::runtime_error(std::to_string(required_width) + "x" + std::to_string(required_height) + " terminal required to display this " + std::to_string(minefield_width) + "x" + std::to_string(minefield_height) + " minefield (Current: " + std::to_string(io->getWidth()) + "x" + std::to_string(io->getHeight()) + ")");
     }
 }
 
@@ -360,3 +364,46 @@ Controller Display::getController() {
     return controller;
 }
 
+std::tuple<int, int, int> Display::getMaximumFieldsize(int window_width, int window_height, int mine_count) {
+    int width = 1;
+    int height = 1;
+    int count = mine_count;
+
+    if (! isWindowSizeSufficient(width, height, count, window_width, window_height)) {
+        int required_width, required_height;
+        std::tie(required_width, required_height) = Display::getRequiredWindowSize(width, height, count);
+        throw std::runtime_error("Can't display any minefield on this size (" + std::to_string(window_width) + "x" + std::to_string(window_height) + "), minimum required: " + std::to_string(required_width) + "x" + std::to_string(required_height));
+    }
+
+    // get max y
+    while (isWindowSizeSufficient(width, height, count, window_width, window_height)) {
+        height++;
+    }
+    // height is now one too much
+    height--;
+
+    // get max x
+    while (isWindowSizeSufficient(width, height, count, window_width, window_height)) {
+        width++;
+    }
+    // width is now one too much
+    width--;
+
+    // now get max. minecount
+    
+    int exponent = 0;
+    while (isWindowSizeSufficient(width, height, count, window_width, window_height) && count <= width * height) {
+        exponent++;
+        if (std::numeric_limits<int>::digits10 < exponent) {
+            break;
+        }
+        count = std::pow(10, exponent);
+    }
+    // remove one decimal digit -> is OK
+    count--;
+    if (count > width * height) {
+        count = width * height;
+    }
+
+    return std::make_tuple(width, height, count);
+}

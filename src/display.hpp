@@ -97,7 +97,9 @@ class Display {
         void startWindow();
 
     public:
+        /// the displayed messages on the status bar
         static const struct msgs_struct msgs;
+
         /**
          * Constructor. Automatically takes over the window. (Is blocking)
          * @param given_iodevice an IO-device to read the controls from and display the output to
@@ -122,9 +124,21 @@ class Display {
          * @return tuple containg x and y coordinate on the console
          */
         static std::tuple<int, int> getConsolePosition(int x, int y);
+
+        /**
+         * Calculates the maximum size of a minefield that can be displayed on the given window.
+         * First tries to find a maximum window size using the given mine count, use 1 if none is given.
+         * Tries to find the maximum mine count after that (maximum: height*width).
+         * @param window_width the width of the window (Note: COLS)
+         * @param window_height the height of the window (Note: LINES)
+         * @param mine_count the minimum mine count to be used
+         * @returns (width, height, mine_count) largest displayable minefield
+         */
+        static std::tuple<int, int, int> getMaximumFieldsize(int window_width, int window_height, int mine_count = 1);
         
         /**
          * Checks if a given window size is sufficient to display a given mine field.
+         * @returns true if the given window size is sufficient for given mine field
          */
         static bool isWindowSizeSufficient(int field_width, int field_height, int mine_count, int window_width, int window_height);
 
