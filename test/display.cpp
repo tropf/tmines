@@ -479,8 +479,112 @@ TEST_CASE("Printout Mines") {
     }
 }
 
-TEST_CASE("Printout Statusbar") {
+TEST_CASE("Printout mine count (and running statusbar)") {
     // checks that the status bar display the current status of the game
+
+    msgs_struct msgs;
+    
+    // test the minecount
+    for (int flag_cnt = 0; flag_cnt < 6; flag_cnt++) {
+        auto io = std::make_shared<IODeviceSimulation>(IODeviceSimulation());
+        io->setDim(100, 100);
+        // go to the left
+        io->addChars("hhhh");
+
+        for (int i = 0; i < flag_cnt; i++) {
+            io->addChars("fl");
+        }
+
+        io->addChar(KEY_RESIZE);
+        io->mockResize();
+        CHECK_THROWS(Display(io, 8, 8, 10));
+        io->mockResize(-1);
+
+        // construct a string from the printed chars
+        auto printed_chars = io->getPrintedChars();
+
+        std::string everything = "";
+        
+        for (int y = 0; y < io->getHeight(); y++) {
+            for (int x = 0; x < io->getWidth(); x++) {
+                everything += printed_chars[x][y];
+            }
+        }
+
+        // has to display the minecount somewhere
+        int mine_cnt = 10 - flag_cnt;
+        std::string mine_cnt_str = std::to_string(mine_cnt);
+        CHECK(everything.find(mine_cnt_str) != std::string::npos);
+
+        CHECK(everything.find(msgs.running) != std::string::npos);
+        CHECK(everything.find(msgs.lost) == std::string::npos);
+        CHECK(everything.find(msgs.won) == std::string::npos);
+    }
+}
+
+TEST_CASE("Printout lost") {
+    // check lost
+    auto io = std::make_shared<IODeviceSimulation>(IODeviceSimulation());
+    io->setDim(100, 100);
+
+    msgs_struct msgs;
+
+    io->addChars(" d q");
+    // prove it works regularly
+    CHECK_NOTHROW(Display(io, 8, 8, 62, 0));
+
+    io->addChars(" d ");
+    io->addChar(KEY_RESIZE);
+    io->mockResize();
+    CHECK_THROWS(Display(io, 8, 8, 62, 0));
+    io->mockResize(-1);
+
+    // construct a string from the printed chars
+    auto printed_chars = io->getPrintedChars();
+
+    std::string everything = "";
+    
+    for (int y = 0; y < io->getHeight(); y++) {
+        for (int x = 0; x < io->getWidth(); x++) {
+            everything += printed_chars[x][y];
+        }
+    }
+
+    CHECK(everything.find(msgs.running) == std::string::npos);
+    CHECK(everything.find(msgs.lost) != std::string::npos);
+    CHECK(everything.find(msgs.won) == std::string::npos);
+}
+
+TEST_CASE("Printout statusbar won") {
+    // check won
+    msgs_struct msgs;
+    auto io = std::make_shared<IODeviceSimulation>(IODeviceSimulation());
+    io->setDim(100, 100);
+
+    io->addChars(" q");
+    // prove it works regularly
+    CHECK_NOTHROW(Display(io, 8, 8, 63));
+
+    io->addChar(' ');
+    io->addChar(KEY_RESIZE);
+    io->mockResize();
+    CHECK_THROWS(Display(io, 8, 8, 63));
+    io->mockResize(-1);
+
+    // construct a string from the printed chars
+    auto printed_chars = io->getPrintedChars();
+
+    std::string everything = "";
+    
+    for (int y = 0; y < io->getHeight(); y++) {
+        for (int x = 0; x < io->getWidth(); x++) {
+            everything += printed_chars[x][y];
+        }
+    }
+
+    CHECK(everything.find(msgs.running) == std::string::npos);
+    CHECK(everything.find(msgs.lost) == std::string::npos);
+    CHECK(everything.find(msgs.won) != std::string::npos);
 }
 
 TEST_CASE("Error Reports") {
