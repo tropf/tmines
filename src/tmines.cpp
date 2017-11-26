@@ -160,14 +160,14 @@ int main(int argc, char** argv) {
         {"height", 'h', "HEIGHT", 0, "height of the minefield, default: 10", 10},
         {0, 'y', 0, OPTION_ALIAS, 0, 10},
         {"fullscreen", 'f', 0, 0, "use full screen size", 10},
-        {"", 0, 0, OPTION_DOC, "note: use either fullscreen or specify size explicitly (not both)", 10},
+        {0, 0, 0, OPTION_DOC, "note: use either fullscreen or specify size explicitly (not both)", 10},
 
         {0, 0, 0, 0, "Mines", 20},
         {"mine-count", 'c', "NUM", 0, "number of mines to be placed", 20},
         {"count", 0, 0, OPTION_ALIAS | OPTION_HIDDEN, 0, 20},
         {"mine-density", 'd', "PERCENTAGE", 0, "density of mines to be placed, default: 16%. Specify as number between 0 and 100 (for percentages), omit '\%' charater", 20},
         {"density", 0, 0, OPTION_ALIAS | OPTION_HIDDEN, 0, 20},
-        {"", 0, 0, OPTION_DOC, "note: use either mine density or specify mine count explicitly (not both)", 20},
+        {0, 0, 0, OPTION_DOC, "note: use either mine density or specify mine count explicitly (not both)", 20},
 
         {0, 0, 0, 0, "Other", 30},
         {"autodiscover-only", 'a', 0, 0, "if enabled: fields can only be opened using autodiscover feature (see man)", 30},

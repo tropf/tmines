@@ -1,12 +1,146 @@
-.TH tmines 1
-.SH NAME
-tmines - Terminate Mines, a Minesweeper clone
-.SH SYNOPSIS
-.B tmines
-[\fB\-a\fP] [\fB\-?\fP] [\fB\-\fPV] [\fB\-c\fP \fINUM\fP] [\fB\-h\fP \fIHEIGHT\fP] [\fB\-y\fP \fIHEIGHT\fP] [\fB\-s\fP \fISEED\fP] [\fB\-w\fP \fIWIDTH\fP]
-[\fB\-x\fP \fIWIDTH\fP] [\fB\-\-autodiscover-only\fP] [\fB\-\-mine\-count\fP=\fINUM\fP] [\fB\-\-count\fP=\fINUM\fP]
-[\fB\-\-height\fP=\fIHEIGHT\fP] [\fB\-\-seed\fP=\fISEED\fP] [\fB\-\-width\fP=\fIWIDTH\fP] [\fB\-\-help\fP] [\fB\-\-usage\fP]
-[\fB\-\-version\fP]
+.\" generated with Ronn/v0.7.3
+.\" http://github.com/rtomayko/ronn/tree/0.7.3
+.
+.TH "TMINES" "1" "November 2017" "" ""
+.
+.SH "NAME"
+\fBtmines\fR \- Terminate Mines, a terminal minesweeper clone
+.
+.SH "SYNOPSIS"
+\fBtmines\fR [\fIOPTION\fR\.\.\.]
+.
+.SH "DESCRIPTION"
+tmines allow you to play minesweeper on the terminal\.
+.
+.P
+Use these Options to configure the game:
+.
+.SS "Field Size"
+note: use either fullscreen or specify size explicitly (not both)
+.
+.TP
+\fB\-f\fR, \fB\-\-fullscreen\fR
+use full screen size
+.
+.TP
+\fB\-h\fR, \fB\-y\fR, \fB\-\-height\fR=\fIHEIGHT\fR
+height of the minefield, default: 10
+.
+.TP
+\fB\-w\fR, \fB\-x\fR, \fB\-\-width\fR=\fIWIDTH\fR
+width of the minefield, default: 10
+.
+.SS "Mines"
+note: use either mine density or specify mine count explicitly (not both)
+.
+.TP
+\fB\-c\fR, \fB\-\-mine\-count\fR=\fINUM\fR
+number of mines to be placed
+.
+.TP
+\fB\-d\fR, \fB\-\-mine\-density\fR=\fIPERCENTAGE\fR
+density of mines to be placed, default: 16%\.
+.
+.br
+Specify as number between 0 and 100 (for percentages), omit % charater
+.
+.SS "Other"
+.
+.TP
+\fB\-a\fR, \fB\-\-autodiscover\-only\fR
+if enabled: fields can only be opened using autodiscover feature
+.
+.TP
+\fB\-s\fR, \fB\-\-seed\fR=\fISEED\fR
+seed for field generation, suitable seed will be chosen by automatically
+.
+.TP
+\fB\-?\fR, \fB\-\-help\fR
+Give a help list
+.
+.TP
+\fB\-\-usage\fR
+Give a short usage message
+.
+.TP
+\fB\-V\fR, \fB\-\-version\fR
+Print program version
+.
+.SS "Controls"
+.
+.TP
+\fBMovement\fR
+WASD, Arrow Keys, vimlike (HJKL)
+.
+.TP
+\fBFlag Mine\fR
+F
+.
+.TP
+\fBOpen Field\fR
+Space
+.
+.TP
+\fBQuit\fR
+Q
+.
+.SS "General Rules"
+A set number of mines is placed at random on the minefield\. You can open single spots to see how many mines are sorrounding that spot\. This number can go up to 8 in the worst case, in the best case it is 0\.
+.
+.P
+Your job if to open all spots that are not mines\. If you open a mine, you loose the game\.
+.
+.P
+Flags can be placed to mark a spot where a mine is located\. Flagged spots can\'t be opened accidentally by clicking\.
+.
+.SS "Autodiscover"
+Suppose a setup like this:
+.
+.IP "" 4
+.
+.nf
 
-.SH Description
-Terminate Mines is a Minesweeper clone. 
+* * * *
+* * ? 2
+* *[1]1
+* * 2
+.
+.fi
+.
+.IP "" 0
+.
+.P
+When you then click the mine \fB[1]\fR, the obvious fields not containing any mines will be opened:
+.
+.IP "" 4
+.
+.nf
+
+* * * *
+* 2 ? 2
+* 1 1 1
+* 1 2
+.
+.fi
+.
+.IP "" 0
+.
+.P
+When using \fB\-\-autodiscover\-only\fR, the only way to open mines is in this way\. While \fB\-\-autodiscover\-only\fR is active, trying to directly open a mine \fB*\fR will not work and be ignored by the program\.
+.
+.SH "REPORTING BUGS"
+Report bugs to tropf@posteo\.de\.
+.
+.P
+When a Crash happens, the file \fBtmines\.crash\fR will be written into your current directory\. Please include that file in your crash report\.
+.
+.P
+It contains useful information to reproduce and fix the problem\.
+.
+.P
+Note: The crash report contains a list of pressed keys\. These are anonymized, meaning WASD gets converted to hjkl, and only keypresses relevant to the program are recorded\.
+.
+.SH "AUTHORS"
+.
+.SH "COPYRIGHT"
+
