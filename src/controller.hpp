@@ -81,6 +81,12 @@ class Controller {
         int getHeight();
 
         /**
+         * Wether autodiscover only has been enabled in the constructor.
+         * @returns true if autodiscover only has been passed in the constructor
+         */
+        bool isAutodiscoverOnly();
+
+        /**
          * Moves the cursor to the right.
          * Never throws, even if movement is impossible.
          */

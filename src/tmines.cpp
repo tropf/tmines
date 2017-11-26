@@ -135,25 +135,12 @@ void run() {
         // initalize LINES and COLS vars
         initscr();
         endwin();
-        opts.height = 0;
-        opts.width = 0;
 
-        int required_width = 0, required_height = 0;
-        int mine_count = 0;
+        int max_mine_count;
+        std::tie(opts.width, opts.height, max_mine_count) = Display::getMaximumFieldsize(COLS, LINES);
 
-        // maximum possible X coordinate: 41
-        // so after the loop opts.width will be 42
-        // so there will be 42 indexes, 0..41
-        while (required_width < COLS) {
-            opts.width++;
-            // recalculate dimensions
-            std::tie(required_width, required_height) = Display::getRequiredWindowSize(opts.width, opts.height, get_minecount_for_size());
-        }
-
-        while (required_height < LINES) {
-            opts.height++;
-            // recalculate dimensions
-            std::tie(required_width, required_height) = Display::getRequiredWindowSize(opts.width, opts.height, get_minecount_for_size());
+        if (get_minecount_for_size(opts.width, opts.height) > max_mine_count) {
+            opts.mine_count = get_minecount_for_size(opts.width, opts.height);
         }
     }
 

@@ -437,4 +437,36 @@ TEST_CASE("Error Reports") {
 
 TEST_CASE("Check passing") {
     // check that params are actually passed to the controller and minefield
+    auto io = std::make_shared<IODeviceSimulation>(IODeviceSimulation());
+    io->addChars("qqqqqqqqqqqqqqqqqqqqqqq");
+    io->setDim(100, 100);
+
+    Display d1(io, 8, 8, 1, 0, false);
+    auto con = d1.getController();
+    CHECK(8 == con.getWidth());
+    CHECK(8 == con.getHeight());
+    CHECK(! con.isAutodiscoverOnly());
+    auto mfield = con.getMinefield();
+    CHECK(8 == mfield.getXDimension());
+    CHECK(8 == mfield.getYDimension());
+    CHECK(1 == mfield.getMineCount());
+    CHECK(0 == mfield.getSeed());
+
+    Display d2(io, 7, 13, 42, 1337, true);
+    con = d2.getController();
+    CHECK(7 == con.getWidth());
+    CHECK(13 == con.getHeight());
+    CHECK(con.isAutodiscoverOnly());
+    mfield = con.getMinefield();
+    CHECK(7 == mfield.getXDimension());
+    CHECK(13 == mfield.getYDimension());
+    CHECK(42 == mfield.getMineCount());
+    CHECK(1337 == mfield.getSeed());
+
+    // also errors of Mfield get thrown
+    CHECK_THROWS(Display(io, 1, 1, 2));
+    CHECK_NOTHROW(Display(io, 1, 1, 0));
+    CHECK_THROWS(Display(io, 0, 1, 0));
+    CHECK_THROWS(Display(io, 1, -1, 0));
+    CHECK_THROWS(Display(io, 1, 1, -1));
 }

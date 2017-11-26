@@ -30,6 +30,10 @@ int Controller::getHeight() {
     return mfield.getYDimension();
 }
 
+bool Controller::isAutodiscoverOnly() {
+    return autodiscover_only;
+}
+
 void Controller::moveRight() {
     putCursor(x + 1, y);
 }
