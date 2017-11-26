@@ -3,7 +3,7 @@
 #include <curses.h>
 #include <string>
 
-char IODeviceCurses::getChar() {
+int IODeviceCurses::getChar() {
     return getch();
 }
 

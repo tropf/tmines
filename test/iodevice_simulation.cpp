@@ -42,6 +42,22 @@ TEST_CASE("Add Char Test") {
     CHECK('\n' == io.getChar());
     CHECK(0 == io.getChar());
 
+    // test on non-chars
+    // (compatibility to curses KEY_ consts)
+    io.addChar(1337);
+    io.addChars("Alf");
+    io.addChar(238);
+    io.addChar(-1);
+    io.addChar(0);
+    
+    CHECK(1337 == io.getChar());
+    CHECK('A' == io.getChar());
+    CHECK('l' == io.getChar());
+    CHECK('f' == io.getChar());
+    CHECK(238 == io.getChar());
+    CHECK(-1 == io.getChar());
+    CHECK(0 == io.getChar());
+
     // wait so it is really blocking
     io.addChars("Y");
     CHECK('Y' == io.getChar());
@@ -79,7 +95,9 @@ TEST_CASE("Dimensions Test, setDim()+isPosValid()") {
     CHECK(io.isPosValid(3, 3));
 
     // fill w/ example data
+    CHECK(! io.isColorStarted());
     io.startColor();
+    CHECK(io.isColorStarted());
     io.setDim(10, 10);
     io.addColor(17, 0, 7);
     io.addColor(42, 4, 5);
@@ -150,13 +168,27 @@ TEST_CASE("Color Test") {
     CHECK_THROWS(io.addColor(0, 0, 10));
     CHECK_THROWS(io.setColor(0));
 
+    CHECK(! io.isColorStarted());
     io.startColor();
+    CHECK(io.isColorStarted());
 
     io.addColor(0, 0, 10);
     io.addColor(1, 1, 11);
     io.addColor(2, 2, 12);
     io.addColor(17, 0, 7);
     io.addColor(42, 4, 5);
+
+    auto colors = io.getColorPairs();
+    CHECK(0 == std::get<0>(colors[0]));
+    CHECK(10 == std::get<1>(colors[0]));
+    CHECK(1 == std::get<0>(colors[1]));
+    CHECK(11 == std::get<1>(colors[1]));
+    CHECK(2 == std::get<0>(colors[2]));
+    CHECK(12 == std::get<1>(colors[2]));
+    CHECK(0 == std::get<0>(colors[17]));
+    CHECK(7 == std::get<1>(colors[17]));
+    CHECK(4 == std::get<0>(colors[42]));
+    CHECK(5 == std::get<1>(colors[42]));
 
     io.setColor(0);
     io.putString(0, 0, "012345");
@@ -315,11 +347,28 @@ TEST_CASE("Move Cursor") {
     io.initWindow();
 
     CHECK_NOTHROW(io.moveCursor(0, 0));
+    CHECK(0 == io.getCursorX());
+    CHECK(0 == io.getCursorY());
+
     CHECK_NOTHROW(io.moveCursor(9, 0));
+    CHECK(9 == io.getCursorX());
+    CHECK(0 == io.getCursorY());
+
     CHECK_NOTHROW(io.moveCursor(0, 9));
+    CHECK(0 == io.getCursorX());
+    CHECK(9 == io.getCursorY());
+
     CHECK_NOTHROW(io.moveCursor(9, 9));
+    CHECK(9 == io.getCursorX());
+    CHECK(9 == io.getCursorY());
+
     CHECK_NOTHROW(io.moveCursor(4, 5));
+    CHECK(4 == io.getCursorX());
+    CHECK(5 == io.getCursorY());
+
     CHECK_NOTHROW(io.moveCursor(2, 2));
+    CHECK(2 == io.getCursorX());
+    CHECK(2 == io.getCursorY());
 
     CHECK_THROWS(io.moveCursor(10, 0));
     CHECK_THROWS(io.moveCursor(0, 10));
@@ -331,11 +380,28 @@ TEST_CASE("Move Cursor") {
     io.setDim(3, 8);
 
     CHECK_NOTHROW(io.moveCursor(0, 0));
+    CHECK(0 == io.getCursorX());
+    CHECK(0 == io.getCursorY());
+
     CHECK_NOTHROW(io.moveCursor(2, 0));
+    CHECK(2 == io.getCursorX());
+    CHECK(0 == io.getCursorY());
+
     CHECK_NOTHROW(io.moveCursor(0, 7));
+    CHECK(0 == io.getCursorX());
+    CHECK(7 == io.getCursorY());
+
     CHECK_NOTHROW(io.moveCursor(2, 7));
+    CHECK(2 == io.getCursorX());
+    CHECK(7 == io.getCursorY());
+
     CHECK_NOTHROW(io.moveCursor(1, 5));
+    CHECK(1 == io.getCursorX());
+    CHECK(5 == io.getCursorY());
+
     CHECK_NOTHROW(io.moveCursor(1, 1));
+    CHECK(1 == io.getCursorX());
+    CHECK(1 == io.getCursorY());
 
     CHECK_THROWS(io.moveCursor(3, 0));
     CHECK_THROWS(io.moveCursor(0, 8));
@@ -351,8 +417,13 @@ TEST_CASE("Set Visibility") {
     io.initWindow();
 
     CHECK_NOTHROW(io.setCursorVisibility(0));
+    CHECK(0 == io.getCursorVisibility());
+
     CHECK_NOTHROW(io.setCursorVisibility(1));
+    CHECK(1 == io.getCursorVisibility());
+
     CHECK_NOTHROW(io.setCursorVisibility(2));
+    CHECK(2 == io.getCursorVisibility());
 
     CHECK_THROWS(io.setCursorVisibility(-1));
     CHECK_THROWS(io.setCursorVisibility(-7));
@@ -377,8 +448,16 @@ TEST_CASE("Test Clear") {
     CHECK('W' == charsbefore[1][1]);
     CHECK('!' == charsbefore[5][1]);
 
+    CHECK(0 == io.getClearCount());
+    CHECK(0 == io.getRefreshCount());
+
     io.clear();
+    CHECK(1 == io.getClearCount());
+    CHECK(0 == io.getRefreshCount());
+
     io.refresh();
+    CHECK(1 == io.getClearCount());
+    CHECK(1 == io.getRefreshCount());
 
     auto charsafter = io.getPrintedChars();
     CHECK(0 == charsafter[0][0]);
@@ -392,21 +471,38 @@ TEST_CASE("init & end") {
 
     CHECK_NOTHROW(io.setDim(10, 10));
 
-    // inside one object
+    CHECK(0 == io.getInitCount());
+    CHECK(0 == io.getEndWindowCount());
+
     CHECK_THROWS(io.putString(0, 0, "Hallo W!"));
+
     io.initWindow();
+
+    CHECK(1 == io.getInitCount());
+    CHECK(0 == io.getEndWindowCount());
+
     CHECK_NOTHROW(io.putString(0, 0, "Hallo W!"));
+
     io.endWindow();
+
+    CHECK(1 == io.getInitCount());
+    CHECK(1 == io.getEndWindowCount());
+
     CHECK_THROWS(io.putString(0, 0, "Hallo W!"));
+
 
     CHECK_THROWS(io.putString(0, 0, "Hallo W!"));
 
     io.initWindow();
+    CHECK(2 == io.getInitCount());
+    CHECK(1 == io.getEndWindowCount());
 
     CHECK_NOTHROW(io.putString(0, 0, "Hallo W!"));
     CHECK_NOTHROW(io.putString(1, 1, "Hallo W!"));
 
     io.endWindow();
+    CHECK(2 == io.getInitCount());
+    CHECK(2 == io.getEndWindowCount());
 
     CHECK_THROWS(io.putString(0, 0, "Hallo W!"));
     CHECK_THROWS(io.putString(1, 1, "Hallo W!"));
@@ -416,8 +512,16 @@ TEST_CASE("misc") {
     // test that function exists
     IODeviceSimulation io;
     io.initWindow();
+
+    CHECK(! io.isSpecialKeysEnabled());
     CHECK_NOTHROW(io.startSpecialKeys());
+    CHECK(io.isSpecialKeysEnabled());
+
     CHECK_NOTHROW(io.setEcho(true));
+    CHECK(io.isEchoMode());
     CHECK_NOTHROW(io.setEcho(true));
     CHECK_NOTHROW(io.setEcho(false));
+    CHECK(! io.isEchoMode());
+
+    io.endWindow();
 }

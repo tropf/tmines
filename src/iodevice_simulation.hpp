@@ -8,6 +8,7 @@
 #include <vector>
 #include <map>
 #include <tuple>
+#include <list>
 
 /**
  * Can be used to simulate user Input and screen Output for 
@@ -16,7 +17,12 @@
  */
 class IODeviceSimulation: public IODevice {
     private:
-        std::stringstream input;
+        /// the keys pressed
+        /**
+         * The Keys Pressed
+         * Note: Stored as ints for compatibility to curses KEY_ consts.
+         */
+        std::list<int> input;
 
         /// foreground colors
         std::vector<std::vector<int>> foreground;
@@ -40,6 +46,38 @@ class IODeviceSimulation: public IODevice {
         std::map<int, std::tuple<int, int>> colors = {
             {0, std::make_tuple(0, 0)}
         };
+
+        /// cursor pos x coordinat
+        int cursorX;
+
+        /// cursor pos y coordinat
+        int cursorY;
+
+        /// the set cursor visibility
+        /**
+         * the given cursor visibility
+         *
+         * Note: initialized to one, "visible" (0 is invisible)
+         */
+        int cursorVisibility = 1;
+
+        /// how often the window has been cleared
+        int clearCnt = 0;
+
+        /// how often refresh() has been called
+        int refreshCnt = 0;
+
+        /// how often initWindow() has been called
+        int initCnt = 0;
+
+        /// how often endWindow() has been called
+        int endWinCnt = 0;
+
+        /// the given echo mode
+        bool echoMode = true;
+
+        /// wether special keys have been enabled
+        bool specialKeysEnabled = false;
 
         /**
          * Throws if given coordinates are invalid
@@ -74,14 +112,18 @@ class IODeviceSimulation: public IODevice {
 
         /**
          * Adds a char to be read from std::cin, same as pressing a button
+         *
+         * Note: Given as int for compatibility to curses KEY_ consts.  
+         * Note: Never printed to virtual console, even w/ echo mode enabled (contrary to default console behaviour)
          * @param nextchar the key to be pressed
          */
-        void addChar(char nextchar);
+        void addChar(int nextchar);
 
         /**
          * Adds a lot of chars (given as string) to the input feed, same as pressing a lot of buttons
-         * @param nextchars the keys to be pressed
          * to the input feed, same as pressing a lot of buttons
+         *
+         * Note: Never printed to virtual console, even w/ echo mode enabled (contrary to default console behaviour)
          * @param nextchars the keys to be pressed
          */
         void addChars(std::string nextchars);
@@ -138,9 +180,78 @@ class IODeviceSimulation: public IODevice {
          */
         int getPrintedChar(int x, int y);
 
+        /**
+         * Retrieves the current position of the cursor on the virtual console.
+         * @returns the X coordinate on the console of the cursor
+         */
+        int getCursorX();
+
+        /**
+         * Retrieves the current position of the cursor on the virtual console.
+         * @returns the X coordinate on the console of the cursor
+         */
+        int getCursorY();
+
+        /**
+         * Retrieves the cursors visibility value
+         * @returns the set visibility value
+         */
+        int getCursorVisibility();
+
+        /**
+         * Returns how often the clear() method has been called
+         * @returns the amount the clear() method has been called
+         */
+        int getClearCount();
+
+        /**
+         * The Number of times refresh() has been called
+         * @returns the amount refresh() has been called
+         */
+        int getRefreshCount();
+
+        /**
+         * The Number of times init() method has been called
+         * @returns the amount init() has been called
+         */
+        int getInitCount();
+
+        /**
+         * The number of times the endWindow() method has been called
+         * @returns the amount endWindow() has been called
+         */
+        int getEndWindowCount();
+
+        /**
+         * If the echo mode is enabled.
+         * @returns the set echo mode
+         */
+        bool isEchoMode();
+
+        /**
+         * Wether the color mode has been enabled
+         * @returns true if startColor() has been called
+         */
+        bool isColorStarted();
+
+        /**
+         * Wether special keys have been enabled
+         *
+         * Note: Gramatically incorrect but kept for code style reasons
+         * @returns if startSpecialKeys() has been called
+         */
+        bool isSpecialKeysEnabled();
+
+        /**
+         * Returns the internal storage of the color pairs as map.  
+         * `id-> (foreground, background)`
+         * @returns the added color pairs
+         */
+        std::map<int, std::tuple<int, int>> getColorPairs();
+
         // methods from interface
 
-        char getChar();
+        int getChar();
         void setColor(int colorCode);
         void putString(int x, int y, std::string to_print);
         void moveCursor(int x, int y);

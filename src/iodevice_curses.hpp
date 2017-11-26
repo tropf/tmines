@@ -7,7 +7,7 @@
 
 class IODeviceCurses: public IODevice {
     public:
-        char getChar();
+        int getChar();
         void setColor(int colorCode);
         void putString(int x, int y, std::string to_print);
         void moveCursor(int x, int y);

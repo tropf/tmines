@@ -6,6 +6,7 @@
 #include <vector>
 #include <map>
 #include <tuple>
+#include <algorithm>
 
 void IODeviceSimulation::checkColorMode() {
     if (!colorMode) {
@@ -19,20 +20,24 @@ void IODeviceSimulation::checkWindowActive() {
     }
 }
 
-char IODeviceSimulation::getChar() {
-    char c = -1;
-    while (-1 == c) {
-        c = input.get();
+int IODeviceSimulation::getChar() {
+    int c;
+    while (1 > input.size()) {
+        // busy wait
     }
+    c = input.front();
+    input.pop_front();
     return c;
 }
 
-void IODeviceSimulation::addChar(char nextchar){
-    input << nextchar; 
+void IODeviceSimulation::addChar(int nextchar){
+    input.push_back(nextchar);
 }
 
 void IODeviceSimulation::addChars(std::string nextchars){
-    input << nextchars;
+    for (int character : nextchars) {
+        input.push_back(character);
+    }
 }
 
 void IODeviceSimulation::checkPos(int x, int y) {
@@ -94,6 +99,51 @@ int IODeviceSimulation::getPrintedChar(int x, int y){
     return chars[x][y];
 }
 
+int IODeviceSimulation::getCursorX() {
+    return cursorX;
+}
+
+int IODeviceSimulation::getCursorY() {
+    return cursorY;
+}
+
+int IODeviceSimulation::getCursorVisibility() {
+    return cursorVisibility;
+}
+
+int IODeviceSimulation::getClearCount() {
+    return clearCnt;
+}
+
+int IODeviceSimulation::getRefreshCount() {
+    return refreshCnt;
+}
+
+int IODeviceSimulation::getInitCount() {
+    return initCnt;
+}
+
+int IODeviceSimulation::getEndWindowCount() {
+    return endWinCnt;
+}
+
+bool IODeviceSimulation::isEchoMode() {
+    return echoMode;
+}
+
+bool IODeviceSimulation::isColorStarted() {
+    return colorMode;
+}
+
+bool IODeviceSimulation::isSpecialKeysEnabled() {
+    return specialKeysEnabled;
+}
+
+std::map<int, std::tuple<int, int>> IODeviceSimulation::getColorPairs() {
+    return colors;
+}
+
+
 void IODeviceSimulation::setColor(int colorCode){
     checkColorMode();
     // check if colorCode even exists
@@ -126,7 +176,8 @@ void IODeviceSimulation::putString(int x, int y, std::string to_print){
 void IODeviceSimulation::moveCursor(int x, int y){
     checkWindowActive();
     checkPos(x, y);
-    // nop otherwise
+    cursorX = x;
+    cursorY = y;
 }
 
 void IODeviceSimulation::setCursorVisibility(int visibility){
@@ -135,6 +186,7 @@ void IODeviceSimulation::setCursorVisibility(int visibility){
     if (visibility < 0 || visibility > 2) {
         throw std::runtime_error("Given visibilty must be either 0, 1, 2");
     }
+    cursorVisibility = visibility;
 }
 
 int IODeviceSimulation::getHeight(){
@@ -160,23 +212,28 @@ void IODeviceSimulation::clear(){
     background.clear();
 
     setDim(width, height);
+
+    clearCnt++;
 }
 
 void IODeviceSimulation::refresh(){
     checkWindowActive();
-    // nop
+    refreshCnt++;
 }
 
 void IODeviceSimulation::initWindow(){
     windowActive = true;
+    initCnt++;
 }
 
 void IODeviceSimulation::endWindow(){
     windowActive = false;
+    endWinCnt++;
 }
 
 void IODeviceSimulation::setEcho(bool enabled){
     checkWindowActive();
+    echoMode = enabled;
 }
 
 void IODeviceSimulation::startColor(){
@@ -185,6 +242,7 @@ void IODeviceSimulation::startColor(){
 
 void IODeviceSimulation::startSpecialKeys(){
     checkWindowActive();
+    specialKeysEnabled = true;
 }
 
 void IODeviceSimulation::addColor(int id, int fg, int bg){

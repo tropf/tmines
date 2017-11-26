@@ -10,9 +10,10 @@ class IODevice {
         /**
          * Returns a pressed key to be handled by the display class.  
          * Is blocking.
+         * Note: Returned as int for compatibility to curses KEY_ consts
          * @returns the pressed key
          */
-        virtual char getChar() = 0;
+        virtual int getChar() = 0;
 
         /**
          * Sets the print color to a predefined color pair

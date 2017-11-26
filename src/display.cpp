@@ -139,8 +139,7 @@ void Display::renderStatusline() {
     int x, y;
     std::tie(x, y) = getConsolePosition(0, mfield.getYDimension() + 1);
 
-    // TODO CHANGE
-    color_set(0, 0);
+    io->setColor(0);
     io->putString(x, y, std::string(getMaxTextWidth(mfield.getMineCount()), ' '));
 
     io->setColor(color_to_use);
@@ -183,6 +182,7 @@ void Display::handleKey(int key) {
         pressed_keys.push_back('r');
         redrawWindow();
     } else if (KEY_RESIZE == key) {
+        pressed_keys.push_back('-');
         checkWindowSize();
     }
 }
@@ -255,22 +255,9 @@ void Display::redrawWindow() {
         }
     }
 
-    if (!io) {
-        throw std::runtime_error("OMG io is NULL");
-    }
     io->clear();
-    if (!io) {
-        throw std::runtime_error("OMG io is NULL");
-    }
     io->refresh();
-
-    if (!io) {
-        throw std::runtime_error("OMG io is NULL");
-    }
     io->endWindow();
-    if (!io) {
-        throw std::runtime_error("OMG io is NULL");
-    }
     startWindow();
 
     renderBoard();
@@ -350,14 +337,8 @@ Display::Display(std::shared_ptr<IODevice> given_iodevice, int width, int height
 
     try {
         startWindow();
-    if (!io) {
-        throw std::runtime_error("OMG io is NULL");
-    }
         run();
         // clear window, so not the entire screen is filled w/ the field after quitting
-    if (!io) {
-        throw std::runtime_error("OMG io is NULL");
-    }
         io->clear();
         io->refresh();
     } catch (std::runtime_error& e) {
@@ -372,9 +353,6 @@ Display::Display(std::shared_ptr<IODevice> given_iodevice, int width, int height
         throw std::runtime_error(msg + "\n\n" + keys_msg);
     }
 
-    if (!io) {
-        throw std::runtime_error("OMG io is NULL");
-    }
     io->endWindow();
 }
 
