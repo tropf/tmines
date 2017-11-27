@@ -3,6 +3,11 @@
 #include "iodevice.hpp"
 #include "iodevice_curses.cpp"
 
+#define INCBIN_PREFIX
+#include "incbin/incbin.h"
+
+INCBIN(license, PROJECT_SOURCE_DIR "/LICENSE.md");
+
 #include <string>
 #include <argp.h>
 #include <stdexcept>
@@ -24,6 +29,7 @@ struct {
     int mine_density = -1;
     bool autodiscover_only = false;
     bool fullscreen = false;
+    bool display_license = false;
 } opts;
 
 bool has_only_digits(const std::string s){
@@ -93,6 +99,10 @@ static int parse_opt(int key, char* arg, struct argp_state* state) {
         case 'a':
             opts.autodiscover_only = true;
             break;
+
+        case 1337:
+            opts.display_license = true;
+            break;
     }
 
     return 0;
@@ -148,8 +158,13 @@ void run() {
         opts.mine_count = get_minecount_for_size(opts.width, opts.height);
     }
 
-    std::shared_ptr<IODevice> iodevice_ptr = std::make_shared<IODeviceCurses>(IODeviceCurses());
-    Display(iodevice_ptr, opts.width, opts.height, opts.mine_count, opts.seed, opts.autodiscover_only);
+    if (opts.display_license) {
+        std::string license_string(licenseData, licenseData + licenseSize);
+        std::cout << license_string << std::endl;
+    } else {
+        std::shared_ptr<IODevice> iodevice_ptr = std::make_shared<IODeviceCurses>(IODeviceCurses());
+        Display(iodevice_ptr, opts.width, opts.height, opts.mine_count, opts.seed, opts.autodiscover_only);
+    }
 }
 
 int main(int argc, char** argv) {
@@ -171,7 +186,10 @@ int main(int argc, char** argv) {
 
         {0, 0, 0, 0, "Other", 30},
         {"autodiscover-only", 'a', 0, 0, "if enabled: fields can only be opened using autodiscover feature (see man)", 30},
-        {"seed", 's', "SEED", 0, "seed for field generation, suitable seed will be chosen by automatically", 30},
+        {"seed", 's', "SEED", 0, "seed for field generation, suitable seed will be chosen automatically", 30},
+
+        {"license", 1337, 0, 0, "display the license", -1},
+
         {0, 0, 0, 0, 0, 0}
     };
     struct argp argp = {options, parse_opt, 0, "Play Minesweeper on the terminal.\vControls:\nMovement    WASD, Arrow Keys, vimlike (HJKL)\nFlag Mine   F\nOpen Field  Space\nQuit        Q", 0, 0, 0};

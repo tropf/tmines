@@ -36,7 +36,7 @@ note: use either mine density or specify mine count explicitly (not both)
     autodiscover feature
 - **-s**, **--seed**=_SEED_:
     seed for field generation, suitable seed will be
-    chosen by automatically  
+    chosen automatically  
 - **-?**, **--help**:
     Give a help list
 - **--usage**:

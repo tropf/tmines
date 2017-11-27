@@ -46,6 +46,7 @@ configure_file(
 include_directories("${PROJECT_BINARY_DIR}")
 include_directories("${PROJECT_BINARY_DIR}/src")
 include_directories("${PROJECT_SOURCE_DIR}/src")
+include_directories("${PROJECT_SOURCE_DIR}/extern")
 
 add_library(minefield src/minefield.cpp)
 add_library(controller src/controller.cpp)
@@ -69,10 +70,12 @@ target_link_libraries(tmines iodevice_simulation)
 target_link_libraries(tmines ${CURSES_LIBRARIES})
 
 install(TARGETS tmines DESTINATION bin)
+# add manpage
+INSTALL(FILES ${PROJECT_SOURCE_DIR}/man/tmines.6 DESTINATION man/man6)
+
 
 if (build_tests)
     enable_testing()
-    include_directories(extern/doctest)
 
     add_executable(minefield_test test/minefield.cpp)
     target_link_libraries(minefield_test minefield)

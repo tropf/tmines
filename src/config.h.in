@@ -3,4 +3,6 @@
 #define TerminateMines_GIT_COMMIT_HASH "@GIT_COMMIT_HASH@"
 #define TerminateMines_BUG_ADDRESS "@TerminateMines_BUG_ADDRESS@"
 
+#define PROJECT_SOURCE_DIR "@PROJECT_SOURCE_DIR@"
+
 #define CRASH_REPORT_FILE "tmines.crash"
