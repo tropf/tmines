@@ -74,7 +74,7 @@ sudo apt-get install libncurses5-dev libncurses5 cmake doxygen
 First install the dependencies, then run these commands.
 
 ```bash
-git clone https://hjadhjas.com/tmines
+git clone https://github.com/tropf/tmines
 cd tmines
 mkdir build && cd build
 cmake ..
@@ -101,4 +101,4 @@ If you installed from source, you can:
 This project is available under the MIT license.
 
 ## Github
-Find this project on Github.
+Find this project on [Github](https://github.com/tropf/tmines).
