@@ -216,16 +216,16 @@ TEST_CASE("Click autodiscover feature") {
     mfield = con.getMinefield();
 
     std::vector<std::tuple<int, int>> mines = {
-        {5, 0},
-        {7, 3},
-        {3, 4},
-        {5, 4},
-        {6, 4},
-        {0, 5},
-        {3, 5},
-        {6, 5},
-        {6, 6},
-        {7, 6},
+        std::make_tuple(5, 0),
+        std::make_tuple(7, 3),
+        std::make_tuple(3, 4),
+        std::make_tuple(5, 4),
+        std::make_tuple(6, 4),
+        std::make_tuple(0, 5),
+        std::make_tuple(3, 5),
+        std::make_tuple(6, 5),
+        std::make_tuple(6, 6),
+        std::make_tuple(7, 6),
     };
 
     for (int x = 0; x < mfield.getXDimension(); x++) {
