@@ -7,6 +7,7 @@
 #include "incbin/incbin.h"
 
 INCBIN(license, PROJECT_SOURCE_DIR "/LICENSE.md");
+INCBIN(authors, PROJECT_SOURCE_DIR "/AUTHORS.md");
 
 #include <string>
 #include <argp.h>
@@ -30,6 +31,7 @@ struct {
     bool autodiscover_only = false;
     bool fullscreen = false;
     bool display_license = false;
+    bool display_authors = false;
 } opts;
 
 bool has_only_digits(const std::string s){
@@ -103,6 +105,10 @@ static int parse_opt(int key, char* arg, struct argp_state* state) {
         case 1337:
             opts.display_license = true;
             break;
+
+        case 1338:
+            opts.display_authors = true;
+            break;
     }
 
     return 0;
@@ -158,9 +164,16 @@ void run() {
         opts.mine_count = get_minecount_for_size(opts.width, opts.height);
     }
 
-    if (opts.display_license) {
-        std::string license_string(licenseData, licenseData + licenseSize);
-        std::cout << license_string << std::endl;
+    if (opts.display_license || opts.display_authors) {
+        if (opts.display_license) {
+            std::string license_string(licenseData, licenseData + licenseSize);
+            std::cout << license_string << std::endl;
+        }
+
+        if (opts.display_authors) {
+            std::string authors_string(authorsData, authorsData + authorsSize);
+            std::cout << authors_string << std::endl;
+        }
     } else {
         std::shared_ptr<IODevice> iodevice_ptr = std::make_shared<IODeviceCurses>(IODeviceCurses());
         Display(iodevice_ptr, opts.width, opts.height, opts.mine_count, opts.seed, opts.autodiscover_only);
@@ -189,6 +202,7 @@ int main(int argc, char** argv) {
         {"seed", 's', "SEED", 0, "seed for field generation, suitable seed will be chosen automatically", 30},
 
         {"license", 1337, 0, 0, "display the license", -1},
+        {"authors", 1338, 0, 0, "display the authors", -1},
 
         {0, 0, 0, 0, 0, 0}
     };

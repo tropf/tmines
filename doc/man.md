@@ -121,5 +121,13 @@ It contains useful information to reproduce and fix the problem.
 Note: The crash report contains a list of pressed keys. These are anonymized, meaning WASD gets converted to hjkl, and only keypresses relevant to the program are recorded.
 
 ## AUTHORS
+Rolf Pfeffertal <tropf@posteo.de>
 
 ## COPYRIGHT
+This project is licensed under the MIT license.
+
+```bash
+tmines --license
+```
+
+This command displays the full license text.

@@ -73,7 +73,6 @@ install(TARGETS tmines DESTINATION bin)
 # add manpage
 add_subdirectory(man)
 
-
 if (build_tests)
     add_subdirectory(test)
 endif()
@@ -95,4 +94,5 @@ set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS YES)
 
 set(CPACK_PACKAGE_VERSION_MAJOR ${TerminateMines_VERSION_MAJOR})
 set(CPACK_PACKAGE_VERSION_MINOR ${TerminateMines_VERSION_MINOR})
+set(CPACK_PACKAGE_VERSION_PATCH 0)
 include(CPack)
