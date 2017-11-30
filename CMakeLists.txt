@@ -1,10 +1,10 @@
 cmake_minimum_required (VERSION 2.6)
 
-project (TerminateMines)
+project (TMines)
 
-set (TerminateMines_VERSION_MAJOR 0)
-set (TerminateMines_VERSION_MINOR 9)
-set(CMAKE_CXX_STANDARD 14)
+set(TerminateMines_VERSION_MAJOR 1)
+set(TerminateMines_VERSION_MINOR 0)
+set(CMAKE_CXX_STANDARD 11)
 set(TerminateMines_BUG_ADDRESS "tropf@posteo.de")
 
 option(build_tests "build tests alongside the project" OFF)
@@ -71,30 +71,28 @@ target_link_libraries(tmines ${CURSES_LIBRARIES})
 
 install(TARGETS tmines DESTINATION bin)
 # add manpage
-INSTALL(FILES ${PROJECT_SOURCE_DIR}/man/tmines.6 DESTINATION man/man6)
+add_subdirectory(man)
 
 
 if (build_tests)
-    enable_testing()
-
-    add_executable(minefield_test test/minefield.cpp)
-    target_link_libraries(minefield_test minefield)
-    add_test(minefield_test minefield_test)
-
-    add_executable(controller_test test/controller.cpp)
-    target_link_libraries(controller_test controller)
-    target_link_libraries(controller_test minefield)
-    add_test(controller_test controller_test)
-
-    add_executable(iodevice_simulation_test test/iodevice_simulation.cpp)
-    target_link_libraries(iodevice_simulation_test iodevice_simulation)
-    add_test(iodevice_simulation_test iodevice_simulation_test)
-
-    add_executable(display_test test/display.cpp)
-    target_link_libraries(display_test display)
-    target_link_libraries(display_test controller)
-    target_link_libraries(display_test minefield)
-    target_link_libraries(display_test iodevice_simulation)
-    target_link_libraries(display_test ${CURSES_LIBRARIES})
-    add_test(display_test display_test)
+    add_subdirectory(test)
 endif()
+
+set(CPACK_GENERATOR "TGZ;DEB")
+set(CPACK_SOURCE_GENERATOR "ZIP;TGZ")
+
+string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWERCASE)
+set(CPACK_PACKAGE_NAME ${PROJECT_NAME_LOWERCASE})
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "minesweeper on the terminal")
+set(CPACK_PACKAGE_VENDOR "")
+set(CPACK_PACKAGE_CONTACT ${TerminateMines_BUG_ADDRESS})
+
+set(CPACK_RESOURCE_FILE_LICENSE ${PROJECT_SOURCE_DIR}/LICENSE.md)
+set(CPACK_RESOURCE_FILE_README ${PROJECT_SOURCE_DIR}/README.md)
+
+set(CPACK_DEBIAN_PACKAGE_DEPENDS "libncurses5")
+set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS YES)
+
+set(CPACK_PACKAGE_VERSION_MAJOR ${TerminateMines_VERSION_MAJOR})
+set(CPACK_PACKAGE_VERSION_MINOR ${TerminateMines_VERSION_MINOR})
+include(CPack)

@@ -83,6 +83,33 @@ When you then click the mine `[1]`, the obvious fields not containing any mines 
 When using **--autodiscover-only**, the only way to open mines is in this way.
 While **--autodiscover-only** is active, trying to directly open a mine `*` will not work and be ignored by the program.
 
+## EXAMPLES
+I hate man pages without examples.
+
+### tmines
+Jump in for a fast and easy game
+
+### tmines -f
+play a relatively easy game on fullscreen
+
+### tmines --width 30 --height 16 --mine-count 99
+high difficulty game from the original minesweeper game
+
+### tmines -x30 -y16 -c99
+the same as above, but using the short forms
+
+### tmines --mine-density 30
+play a game with a mine density of 30%
+
+### tmines -d 100
+play with 100% percent mine density -> win instantly, as all non-mine spots have been opened
+
+### tmines -fa
+use your entire screen whith autodiscover only (see above)
+
+### tmines --version
+check out the used version
+
 ## REPORTING BUGS
 Report bugs to tropf@posteo.de.
 
