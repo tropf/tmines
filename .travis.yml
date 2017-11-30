@@ -1,0 +1,16 @@
+language: cpp
+
+compiler:
+    - gcc
+    - clang
+
+before_script:
+    - sudo apt-get install libncurses5-dev libncurses5 cmake
+    - mkdir build
+    - cd build
+    - cmake -Dbuild_tests=ON ..
+
+script:
+    - make
+    - make test
+

@@ -74,6 +74,7 @@ install(TARGETS tmines DESTINATION bin)
 add_subdirectory(man)
 
 if (build_tests)
+    enable_testing()
     add_subdirectory(test)
 endif()
 
