@@ -230,7 +230,7 @@ TEST_CASE("Click autodiscover feature") {
 
     for (int x = 0; x < mfield.getXDimension(); x++) {
         for (int y = 0; y < mfield.getYDimension(); y++) {
-            std::tuple<int, int> as_tuple = {x, y};
+            std::tuple<int, int> as_tuple = std::make_tuple(x, y);
             if (std::find(mines.begin(), mines.end(), as_tuple) == mines.end()) {
                 // has not been found -> can be opened
                 con.tooggleFlag(x, y);
