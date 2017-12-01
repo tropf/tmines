@@ -82,21 +82,21 @@ TEST_CASE("Game State") {
 
     // open all non-mines
     std::vector<std::tuple<int, int>> mines = {
-        {5, 0},
-        {7, 3},
-        {3, 4},
-        {5, 4},
-        {6, 4},
-        {0, 5},
-        {3, 5},
-        {6, 5},
-        {6, 6},
-        {7, 6},
+        std::make_tuple(5, 0),
+        std::make_tuple(7, 3),
+        std::make_tuple(3, 4),
+        std::make_tuple(5, 4),
+        std::make_tuple(6, 4),
+        std::make_tuple(0, 5),
+        std::make_tuple(3, 5),
+        std::make_tuple(6, 5),
+        std::make_tuple(6, 6),
+        std::make_tuple(7, 6),
     };
 
     for (int x = 0; x < mfield.getXDimension(); x++) {
         for (int y = 0; y < mfield.getYDimension(); y++) {
-            std::tuple<int, int> as_tuple = {x, y};
+            std::tuple<int, int> as_tuple = std::make_tuple(x, y);
             if (std::find(mines.begin(), mines.end(), as_tuple) == mines.end()) {
                 // has not been found -> can be opened
                 mfield.open(x, y, false);
