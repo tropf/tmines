@@ -1,4 +1,5 @@
 # tmines
+[![Build Status](https://travis-ci.org/tropf/tmines.svg?branch=master)](https://travis-ci.org/tropf/tmines)  
 `tmines` is a minesweeper clone playable from the terminal.
 
 The idea came to mind when I waited for a java project to compile -- for the entirety of two minutes.  
