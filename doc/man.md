@@ -1,4 +1,4 @@
-tmines(1) -- Terminate Mines, a terminal minesweeper clone
+tmines(6) -- Terminate Mines, a terminal minesweeper clone
 ==========================================================
 
 ## SYNOPSIS
