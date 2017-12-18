@@ -53,6 +53,15 @@ tmines -x 30 -y 16 -c 99
 ```
 
 ## Installation
+### Binary Builds
+Archlinux users can use the [AUR](https://aur.archlinux.org/packages/tmines/).
+
+```bash
+git clone https://aur.archlinux.org/tmines.git && cd tmines
+makepkg
+makepkg -i
+```
+
 ### Dependencies
 #### Running
 `tmines` requires the **curses library** to display information to the console.
