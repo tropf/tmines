@@ -54,6 +54,18 @@ tmines -x 30 -y 16 -c 99
 
 ## Installation
 ### Binary Builds
+#### Ubuntu
+For Ubuntu users a [PPA](https://launchpad.net/~tropf/+archive/ubuntu/ppa) is available.
+
+```bash
+sudo add-apt-repository ppa:tropf/ppa
+sudo apt-get update
+sudo apt-get install tmines
+```
+
+> If there is no build for your version of ubuntu, please open a Github issue. Thank You!
+
+#### Archlinux
 Archlinux users can use the [AUR](https://aur.archlinux.org/packages/tmines/).
 
 ```bash
@@ -62,26 +74,40 @@ makepkg
 makepkg -i
 ```
 
-### Dependencies
-#### Running
+#### Voidlinux
+The package is available in the official [voidlinux repository](https://github.com/voidlinux/void-packages).
+(Thanks [SolitudeSF](https://github.com/SolitudeSF)!)
+
+```bash
+xbps-install -S tmines
+```
+
+### Building From Source
+#### Dependencies
+##### Running
 `tmines` requires the **curses library** to display information to the console.
-#### Building
+
+##### Building
 The Project uses the **c++11** standard, so you need a suitable compiler for that. Any recent version of g++ will work.
 
 **Cmake** is used as a build system. For building the documentation, *doxygen* is required.
 
-#### Dependency Oneliners for Building
-##### Archlinux
+##### Dependency Oneliners For Building
+> Also install a compiler for C++.
+> Any recent g++ will work.
+
+###### Archlinux
 ```bash
 sudo pacman -S ncurses cmake doxygen
 ```
-##### Debian and Ubuntu
+
+###### Debian and Ubuntu
 ```bash
 sudo apt-get install libncurses5-dev libncurses5 cmake doxygen
 ```
 
-### Building From Source
-First install the dependencies, then run these commands.
+#### Build Process
+First install the dependencies, then build the project using the following commands.
 
 ```bash
 git clone https://github.com/tropf/tmines
@@ -94,6 +120,11 @@ sudo make install
 
 ### Uninstall
 If you installed using your package manager, use it to remove the package.
+
+```bash
+sudo apt-get remove tmines # Ubuntu, Debian
+sudo pacman -R tmines # Archlinux
+```
 
 If you installed from source, you can:
 
